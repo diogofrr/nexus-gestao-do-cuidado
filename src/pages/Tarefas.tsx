@@ -1,121 +1,112 @@
 import { useState, type FormEvent } from 'react'
+import { Check, ChevronDown, Pin, Plus, Trash2 } from 'lucide-react'
 import { removeTask, saveTask, toggleTask, toggleTaskPin } from '../data/actions'
 import { useDb } from '../data/store'
 import type { Task, TaskPriority } from '../domain/types'
-import { Empty, Field, Modal, toast } from '../components/ui'
+import { CuidadoTabs, Empty, PageHeader, toast } from '../components/ui'
 
-const PRIORITY_BADGE: Record<TaskPriority, string> = { alta: 'danger', media: 'warn', baixa: 'neutral' }
-const PRIORITY_RANK: Record<TaskPriority, number> = { alta: 0, media: 1, baixa: 2 }
+const PRIORITY: Record<TaskPriority, { label: string; tone: string; rank: number }> = {
+  alta: { label: 'Alta', tone: 'danger', rank: 0 },
+  media: { label: 'Média', tone: 'amber', rank: 1 },
+  baixa: { label: 'Baixa', tone: '', rank: 2 },
+}
 
 export default function Tarefas() {
   const db = useDb()
   const [showDone, setShowDone] = useState(false)
-  const [adding, setAdding] = useState(false)
+  const [title, setTitle] = useState('')
+  const [priority, setPriority] = useState<TaskPriority>('media')
 
   const pending = db.tasks
     .filter((t) => !t.done)
-    .sort((a, b) => Number(b.pinned) - Number(a.pinned) || PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority])
+    .sort((a, b) => Number(b.pinned) - Number(a.pinned) || PRIORITY[a.priority].rank - PRIORITY[b.priority].rank)
   const done = db.tasks.filter((t) => t.done)
 
-  return (
-    <div className="stack">
-      <div className="page-head">
-        <div>
-          <h1>Tarefas</h1>
-          <p>{pending.length} pendente{pending.length === 1 ? '' : 's'}</p>
-        </div>
-        <button className="btn" onClick={() => setAdding(true)}>+ Nova tarefa</button>
-      </div>
+  const add = (e: FormEvent) => {
+    e.preventDefault()
+    if (!title.trim()) return
+    saveTask({ title: title.trim(), category: '', priority, done: false, pinned: false })
+    setTitle('')
+    toast('Tarefa adicionada')
+  }
 
+  return (
+    <div className="page">
+      <PageHeader title="Cuidado" sub="Consultas, remédios, tarefas e a rede de apoio" />
+      <CuidadoTabs />
+
+      <form className="card stack" onSubmit={add}>
+        <label className="sr-only" htmlFor="nova-tarefa">Nova tarefa</label>
+        <input id="nova-tarefa" className="input" placeholder="O que precisa ser feito?" value={title} onChange={(e) => setTitle(e.target.value)} />
+        <div className="row between">
+          <div className="chips" role="group" aria-label="Prioridade">
+            {(['baixa', 'media', 'alta'] as const).map((p) => (
+              <button type="button" key={p} className="chip" aria-pressed={priority === p} onClick={() => setPriority(p)}>{PRIORITY[p].label}</button>
+            ))}
+          </div>
+          <button className="btn" type="submit" disabled={!title.trim()}><Plus size={20} aria-hidden /> Adicionar</button>
+        </div>
+      </form>
+
+      <div className="group-label">{pending.length} {pending.length === 1 ? 'pendente' : 'pendentes'}</div>
       {pending.length === 0 ? (
-        <Empty icon="🎉" title="Tudo em dia" />
+        <div className="card">
+          <Empty icon={Check} title="Tudo em dia">
+            <p>Nenhuma tarefa pendente. Aproveite para descansar um pouco.</p>
+          </Empty>
+        </div>
       ) : (
-        pending.map((t) => <TaskRow key={t.id} task={t} />)
+        <div className="list">{pending.map((t) => <TaskRow key={t.id} task={t} />)}</div>
       )}
 
       {done.length > 0 && (
         <>
-          <button className="btn ghost" onClick={() => setShowDone((s) => !s)} aria-expanded={showDone}>
+          <button className="btn ghost" style={{ marginTop: '1.25rem' }} onClick={() => setShowDone((s) => !s)} aria-expanded={showDone}>
+            <ChevronDown size={18} aria-hidden style={{ rotate: showDone ? '180deg' : '0deg', transition: 'rotate .2s' }} />
             {showDone ? 'Ocultar' : 'Ver'} concluídas ({done.length})
           </button>
-          {showDone && done.map((t) => <TaskRow key={t.id} task={t} />)}
+          {showDone && <div className="list" style={{ marginTop: '0.75rem' }}>{done.map((t) => <TaskRow key={t.id} task={t} />)}</div>}
         </>
       )}
-
-      {adding && <TaskForm onClose={() => setAdding(false)} />}
     </div>
   )
 }
 
 function TaskRow({ task }: { task: Task }) {
+  const p = PRIORITY[task.priority]
   return (
-    <div className="card row between" style={task.done ? { opacity: 0.65 } : undefined}>
-      <div className="row grow">
-        <input
-          type="checkbox"
-          checked={task.done}
-          onChange={() => toggleTask(task.id)}
-          aria-label={`Concluir ${task.title}`}
-          style={{ width: 22, height: 22 }}
-        />
-        <div className="grow">
-          <h3 style={task.done ? { textDecoration: 'line-through' } : undefined}>{task.title}</h3>
-          <div className="row" style={{ marginTop: 4 }}>
-            <span className={`badge ${PRIORITY_BADGE[task.priority]}`}>{task.priority}</span>
-            {task.category && <span className="muted small">{task.category}</span>}
-          </div>
+    <div className={`item${task.done ? ' off' : ''}`}>
+      <button
+        className={`dose-check${task.done ? ' on' : ''}`}
+        onClick={() => toggleTask(task.id)}
+        aria-pressed={task.done}
+        aria-label={`${task.done ? 'Reabrir' : 'Concluir'}: ${task.title}`}
+      >
+        <Check size={18} strokeWidth={3} />
+      </button>
+      <div className="main">
+        <div className="title">{task.title}</div>
+        <div className="row" style={{ gap: '0.4rem', marginTop: 4 }}>
+          {!task.done && <span className={`pill ${p.tone}`}>{p.label}</span>}
+          {task.category && <span className="muted small">{task.category}</span>}
         </div>
       </div>
-      <div className="row">
-        <button
-          className="btn ghost sm"
-          onClick={() => toggleTaskPin(task.id)}
-          aria-pressed={task.pinned}
-          aria-label={task.pinned ? 'Desafixar' : 'Fixar'}
-          title={task.pinned ? 'Desafixar' : 'Fixar'}
-        >
-          📌
+      <div className="trail">
+        {!task.done && (
+          <button
+            className="icon-btn"
+            onClick={() => toggleTaskPin(task.id)}
+            aria-pressed={task.pinned}
+            aria-label={task.pinned ? 'Desafixar' : 'Fixar no topo'}
+            style={task.pinned ? { color: 'var(--brand)' } : undefined}
+          >
+            <Pin size={20} fill={task.pinned ? 'currentColor' : 'none'} />
+          </button>
+        )}
+        <button className="icon-btn" onClick={() => { removeTask(task.id); toast('Tarefa removida') }} aria-label={`Excluir: ${task.title}`}>
+          <Trash2 size={20} />
         </button>
-        <button className="btn ghost sm" onClick={() => { removeTask(task.id); toast('Tarefa removida') }} aria-label={`Remover ${task.title}`}>🗑️</button>
       </div>
     </div>
-  )
-}
-
-function TaskForm({ onClose }: { onClose: () => void }) {
-  const [title, setTitle] = useState('')
-  const [category, setCategory] = useState('')
-  const [priority, setPriority] = useState<TaskPriority>('media')
-  const [error, setError] = useState('')
-
-  const submit = (e: FormEvent) => {
-    e.preventDefault()
-    if (!title.trim()) return setError('Informe o título da tarefa.')
-    saveTask({ title: title.trim(), category: category.trim(), priority, done: false, pinned: false })
-    toast('Tarefa criada')
-    onClose()
-  }
-
-  return (
-    <Modal title="Nova tarefa" onClose={onClose}>
-      <form className="stack" onSubmit={submit} noValidate>
-        <Field label="Título*">{(id) => <input id={id} value={title} onChange={(e) => setTitle(e.target.value)} />}</Field>
-        <Field label="Categoria">{(id) => <input id={id} value={category} onChange={(e) => setCategory(e.target.value)} />}</Field>
-        <Field label="Prioridade">
-          {(id) => (
-            <select id={id} value={priority} onChange={(e) => setPriority(e.target.value as TaskPriority)}>
-              <option value="baixa">Baixa</option>
-              <option value="media">Média</option>
-              <option value="alta">Alta</option>
-            </select>
-          )}
-        </Field>
-        {error && <div className="alert error" role="alert">{error}</div>}
-        <div className="row">
-          <button className="btn" type="submit">Salvar</button>
-          <button className="btn ghost" type="button" onClick={onClose}>Cancelar</button>
-        </div>
-      </form>
-    </Modal>
   )
 }

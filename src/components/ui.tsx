@@ -1,25 +1,124 @@
-import { useEffect, useState, type ReactNode } from 'react'
-import { Link } from 'react-router-dom'
-import type { Psychologist } from '../domain/types'
+import { useEffect, useId, useState, type ReactNode } from 'react'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
+import {
+  CalendarClock,
+  ChevronLeft,
+  Info,
+  Pill,
+  Stethoscope,
+  Ticket,
+  TriangleAlert,
+  Video,
+  X,
+  type LucideIcon,
+} from 'lucide-react'
+import type { AgendaKind } from '../services/agenda'
 
-export function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
-    document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
-  }, [onClose])
+// ---------- estrutura de página ----------
+
+export function PageHeader({
+  title,
+  sub,
+  actions,
+}: {
+  title: string
+  sub?: ReactNode
+  actions?: ReactNode
+}) {
   return (
-    <div className="overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal" role="dialog" aria-modal="true" aria-label={title}>
-        <div className="row between" style={{ marginBottom: 14 }}>
-          <h2>{title}</h2>
-          <button className="btn ghost sm" onClick={onClose} aria-label="Fechar">✕</button>
-        </div>
-        {children}
+    <header className="page-head">
+      <div className="grow">
+        <h1>{title}</h1>
+        {sub && <p className="sub">{sub}</p>}
       </div>
-    </div>
+      {actions && <div className="row">{actions}</div>}
+    </header>
   )
 }
+
+export function BackLink({ to, children = 'Voltar' }: { to?: string; children?: ReactNode }) {
+  const navigate = useNavigate()
+  if (to) {
+    return (
+      <Link to={to} className="back">
+        <ChevronLeft size={20} aria-hidden /> {children}
+      </Link>
+    )
+  }
+  return (
+    <button className="back" style={{ border: 0, background: 'transparent', cursor: 'pointer', font: 'inherit' }} onClick={() => navigate(-1)}>
+      <ChevronLeft size={20} aria-hidden /> {children}
+    </button>
+  )
+}
+
+export function Seg({ tabs }: { tabs: { to: string; label: string }[] }) {
+  return (
+    <nav className="seg" aria-label="Seções">
+      {tabs.map((t) => (
+        <NavLink key={t.to} to={t.to} className={({ isActive }) => (isActive ? 'active' : '')}>
+          {t.label}
+        </NavLink>
+      ))}
+    </nav>
+  )
+}
+
+export function CuidadoTabs() {
+  return (
+    <Seg
+      tabs={[
+        { to: '/consultas', label: 'Consultas' },
+        { to: '/medicacoes', label: 'Remédios' },
+        { to: '/tarefas', label: 'Tarefas' },
+        { to: '/profissionais', label: 'Rede' },
+      ]}
+    />
+  )
+}
+
+export function ApoioTabs() {
+  return (
+    <Seg
+      tabs={[
+        { to: '/psicologos', label: 'Psicólogos' },
+        { to: '/chat', label: 'Conversar' },
+        { to: '/plantao', label: 'Autocuidado' },
+      ]}
+    />
+  )
+}
+
+export function EventosTabs() {
+  return (
+    <Seg
+      tabs={[
+        { to: '/eventos', label: 'Programação' },
+        { to: '/meus-ingressos', label: 'Meus ingressos' },
+      ]}
+    />
+  )
+}
+
+// ---------- ícones por tipo de item ----------
+
+const KIND_ICON: Record<AgendaKind, LucideIcon> = {
+  consulta: Stethoscope,
+  remedio: Pill,
+  sessao: Video,
+  evento: Ticket,
+}
+
+export function KindIcon({ kind, now = false, size = 20 }: { kind: AgendaKind; now?: boolean; size?: number }) {
+  const Icon = KIND_ICON[kind]
+  return (
+    <span className={`kind ${now ? 'now' : kind}`} aria-hidden>
+      <Icon size={size} strokeWidth={1.9} />
+    </span>
+  )
+}
+
+// ---------- formulários ----------
 
 export function Field({
   label,
@@ -30,7 +129,7 @@ export function Field({
   hint?: string
   children: (id: string) => ReactNode
 }) {
-  const id = `f-${label.replace(/\W/g, '').toLowerCase()}`
+  const id = useId()
   return (
     <div className="field">
       <label htmlFor={id}>{label}</label>
@@ -45,59 +144,131 @@ export function FormError({ message, onNavigate }: { message: string; onNavigate
   if (!message) return null
   const planLimit = /plano Basic/.test(message)
   return (
-    <div className={`alert ${planLimit ? 'warn' : 'error'}`} role="alert">
-      <p>{message}</p>
-      {planLimit && (
-        <p style={{ marginTop: 8 }}>
-          <Link to="/configuracoes" onClick={onNavigate}>Ver planos →</Link>
-        </p>
-      )}
+    <div className={`banner ${planLimit ? 'warn' : 'danger'}`} role="alert">
+      <TriangleAlert size={20} aria-hidden />
+      <div>
+        <p>{message}</p>
+        {planLimit && (
+          <p style={{ marginTop: 6 }}>
+            <Link to="/configuracoes/plano" onClick={onNavigate}>Ver planos</Link>
+          </p>
+        )}
+      </div>
     </div>
   )
 }
 
-export function Empty({ icon, title, children }: { icon: string; title: string; children?: ReactNode }) {
+export function Banner({
+  tone = 'info',
+  children,
+  icon: Icon = Info,
+}: {
+  tone?: 'info' | 'warn' | 'danger' | 'success'
+  children: ReactNode
+  icon?: LucideIcon
+}) {
   return (
-    <div className="card empty">
-      <div style={{ fontSize: '2rem' }} aria-hidden>{icon}</div>
-      <h3 style={{ color: 'var(--text)', margin: '6px 0' }}>{title}</h3>
+    <div className={`banner ${tone === 'info' ? '' : tone}`}>
+      <Icon size={20} aria-hidden />
+      <div>{children}</div>
+    </div>
+  )
+}
+
+export function Empty({ icon: Icon = CalendarClock, title, children }: { icon?: LucideIcon; title: string; children?: ReactNode }) {
+  return (
+    <div className="empty">
+      <div className="glyph" aria-hidden>
+        <Icon size={28} strokeWidth={1.8} />
+      </div>
+      <h3>{title}</h3>
       {children}
     </div>
   )
 }
 
-export function Avatar({ psych }: { psych: Pick<Psychologist, 'name' | 'hue'> }) {
-  const initial = psych.name.replace(/^(Dra?\.)\s*/, '')[0]
+export function Avatar({
+  name,
+  hue = 210,
+  size,
+}: {
+  name: string
+  hue?: number
+  size?: 'sm' | 'lg'
+}) {
+  const initial = name.replace(/^(Dra?\.)\s*/, '')[0]?.toUpperCase() ?? '?'
   return (
-    <div className="avatar" style={{ background: `hsl(${psych.hue} 55% 42%)` }} aria-hidden>
+    <div className={`avatar${size ? ` ${size}` : ''}`} style={{ background: `hsl(${hue} 48% 38%)` }} aria-hidden>
       {initial}
     </div>
   )
 }
+
+// ---------- sheet: só para confirmar e para pagar ----------
+
+export function Sheet({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
+    document.addEventListener('keydown', onKey)
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.body.style.overflow = prev
+    }
+  }, [onClose])
+  return (
+    <div className="overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="sheet" role="dialog" aria-modal="true" aria-label={title}>
+        <div className="grab" aria-hidden />
+        <div className="row between" style={{ marginBottom: '0.9rem', flexWrap: 'nowrap' }}>
+          <h2>{title}</h2>
+          <button className="icon-btn" onClick={onClose} aria-label="Fechar">
+            <X size={22} />
+          </button>
+        </div>
+        {children}
+      </div>
+    </div>
+  )
+}
+export const Modal = Sheet
 
 export function Confirm({
   label,
   message,
   onConfirm,
   className = 'btn danger sm',
+  children,
 }: {
   label: string
   message: string
   onConfirm: () => void
   className?: string
+  children?: ReactNode
 }) {
   const [open, setOpen] = useState(false)
   return (
     <>
-      <button className={className} onClick={() => setOpen(true)}>{label}</button>
+      <button className={className} onClick={() => setOpen(true)}>
+        {children ?? label}
+      </button>
       {open && (
-        <Modal title="Confirmar" onClose={() => setOpen(false)}>
-          <p style={{ marginBottom: 16 }}>{message}</p>
-          <div className="row">
-            <button className="btn danger" onClick={() => { setOpen(false); onConfirm() }}>{label}</button>
-            <button className="btn ghost" onClick={() => setOpen(false)}>Voltar</button>
+        <Sheet title="Confirmar" onClose={() => setOpen(false)}>
+          <p style={{ marginBottom: '1.1rem' }}>{message}</p>
+          <div className="stack">
+            <button
+              className="btn danger lg block"
+              onClick={() => {
+                setOpen(false)
+                onConfirm()
+              }}
+            >
+              {label}
+            </button>
+            <button className="btn ghost lg block" onClick={() => setOpen(false)}>Voltar</button>
           </div>
-        </Modal>
+        </Sheet>
       )}
     </>
   )
@@ -115,7 +286,7 @@ export function ToastHost() {
     pushToast = (m) => {
       setMsg(m)
       window.clearTimeout(t)
-      t = window.setTimeout(() => setMsg(null), 3200)
+      t = window.setTimeout(() => setMsg(null), 3600)
     }
     return () => window.clearTimeout(t)
   }, [])

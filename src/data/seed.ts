@@ -1,7 +1,7 @@
 import type { Db, EventItem, Order, PsychSession, Psychologist, Ticket } from '../domain/types'
 import { addDays, toDateStr } from '../services/dates'
 
-export const DB_VERSION = 2
+export const DB_VERSION = 3
 
 const pad = (n: number) => String(n).padStart(2, '0')
 const hhmm = (d: Date) => `${pad(d.getHours())}:${pad(d.getMinutes())}`
@@ -294,6 +294,8 @@ export function makeSeed(now: Date = new Date()): Db {
     orders: [sold5.order, sold8.order, ...myOrders],
     tickets: [...sold5.tickets, ...sold8.tickets, ...myTickets],
     chat: [],
+    // As doses de hoje que já passaram e estão em dia; a Metformina (12:00) fica atrasada de propósito.
+    doseLog: { [`md-2|${day(0)}|08:00`]: true },
     notifications: { medsAndAppointments: true, events: true },
   }
 }

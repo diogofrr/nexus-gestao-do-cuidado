@@ -1,83 +1,142 @@
-import { useState } from 'react'
-import { NavLink, Outlet, useLocation } from 'react-router-dom'
-import AccessibilityModal from './Accessibility'
-import { Modal, ToastHost } from './ui'
+import { useEffect, useState } from 'react'
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
+import {
+  CalendarDays,
+  ClipboardList,
+  LifeBuoy,
+  MessageCircle,
+  Pill,
+  ListChecks,
+  Stethoscope,
+  QrCode,
+  Ticket,
+  Users,
+  UserRound,
+  Brain,
+  Leaf,
+  CaseSensitive,
+  type LucideIcon,
+} from 'lucide-react'
+import { useDb } from '../data/store'
+import AppearanceSheet from './Appearance'
+import { Avatar, ToastHost } from './ui'
 
-const MAIN = [
-  { to: '/dashboard', label: 'Início', icon: '🏠' },
-  { to: '/consultas', label: 'Consultas', icon: '🩺' },
-  { to: '/medicacoes', label: 'Remédios', icon: '💊' },
-  { to: '/tarefas', label: 'Tarefas', icon: '✅' },
-  { to: '/eventos', label: 'Eventos', icon: '🎟️' },
+interface Group {
+  key: string
+  label: string
+  to: string
+  icon: LucideIcon
+  match: string[]
+  links: { to: string; label: string; icon: LucideIcon }[]
+}
+
+const GROUPS: Group[] = [
+  { key: 'hoje', label: 'Hoje', to: '/hoje', icon: CalendarDays, match: ['/hoje'], links: [] },
+  {
+    key: 'cuidado', label: 'Cuidado', to: '/consultas', icon: ClipboardList,
+    match: ['/consultas', '/medicacoes', '/tarefas', '/profissionais', '/sessoes'],
+    links: [
+      { to: '/consultas', label: 'Consultas', icon: Stethoscope },
+      { to: '/medicacoes', label: 'Remédios', icon: Pill },
+      { to: '/tarefas', label: 'Tarefas', icon: ListChecks },
+      { to: '/profissionais', label: 'Rede de apoio', icon: Users },
+    ],
+  },
+  {
+    key: 'apoio', label: 'Apoio', to: '/psicologos', icon: LifeBuoy,
+    match: ['/psicologos', '/chat', '/plantao'],
+    links: [
+      { to: '/psicologos', label: 'Psicólogos', icon: Brain },
+      { to: '/chat', label: 'Conversar com o Nexus', icon: MessageCircle },
+      { to: '/plantao', label: 'Autocuidado', icon: Leaf },
+    ],
+  },
+  {
+    key: 'eventos', label: 'Eventos', to: '/eventos', icon: Ticket,
+    match: ['/eventos', '/meus-ingressos', '/checkin', '/confirmacao/pedido'],
+    links: [
+      { to: '/eventos', label: 'Programação', icon: Ticket },
+      { to: '/meus-ingressos', label: 'Meus ingressos', icon: QrCode },
+    ],
+  },
 ]
 
-const MORE = [
-  { to: '/profissionais', label: 'Profissionais', icon: '👥' },
-  { to: '/psicologos', label: 'Psicólogos', icon: '🧠' },
-  { to: '/meus-ingressos', label: 'Meus ingressos', icon: '📱' },
-  { to: '/chat', label: 'Chat Nexus', icon: '💬' },
-  { to: '/plantao', label: 'Apoio Psicológico', icon: '💙' },
-  { to: '/configuracoes', label: 'Configurações', icon: '⚙️' },
-]
-
-const linkClass = ({ isActive }: { isActive: boolean }) => `side-link${isActive ? ' active' : ''}`
+const inGroup = (g: Group, path: string) => g.match.some((m) => path === m || path.startsWith(`${m}/`))
 
 export default function Layout() {
-  const [more, setMore] = useState(false)
-  const [a11y, setA11y] = useState(false)
   const { pathname } = useLocation()
-  const moreActive = MORE.some((m) => pathname.startsWith(m.to))
+  const db = useDb()
+  const [appearance, setAppearance] = useState(false)
+  const perfilActive = pathname.startsWith('/configuracoes')
+
+  // Cada tela abre no topo, como se fosse uma página nova.
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
 
   return (
-    <div className="shell">
-      <nav className="sidebar" aria-label="Principal">
-        <div className="brand">NEXUS</div>
-        {[...MAIN, ...MORE].map((i) => (
-          <NavLink key={i.to} to={i.to} className={linkClass}>
-            <span aria-hidden>{i.icon}</span> {i.label}
-          </NavLink>
+    <div className="app">
+      <aside className="rail" aria-label="Navegação principal">
+        <Link to="/hoje" className="wordmark">NEXUS</Link>
+        {GROUPS.map((g) => (
+          <div key={g.key}>
+            {g.links.length === 0 ? (
+              <NavLink to={g.to} className={({ isActive }) => `nav${isActive ? ' active' : ''}`}>
+                <g.icon size={20} aria-hidden /> {g.label}
+              </NavLink>
+            ) : (
+              <>
+                <div className="rail-group">{g.label}</div>
+                {g.links.map((l) => (
+                  <NavLink key={l.to} to={l.to} className={({ isActive }) => `nav${isActive ? ' active' : ''}`}>
+                    <l.icon size={20} aria-hidden /> {l.label}
+                  </NavLink>
+                ))}
+              </>
+            )}
+          </div>
         ))}
         <div className="spacer" />
-        <button className="side-link" onClick={() => setA11y(true)}>
-          <span aria-hidden>🔠</span> Tamanho do texto
+        <button className="nav" onClick={() => setAppearance(true)} style={{ border: 0, background: 'transparent', cursor: 'pointer', font: 'inherit', width: '100%', textAlign: 'left' }}>
+          <CaseSensitive size={20} aria-hidden /> Texto e tema
         </button>
-      </nav>
+        <Link to="/configuracoes" className="rail-user">
+          <Avatar name={db.user.name} size="sm" />
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontWeight: 650 }}>{db.user.name}</div>
+            <div className="faint small">Configurações</div>
+          </div>
+        </Link>
+      </aside>
 
-      <main className="main">
-        <div className="topbar">
-          <span className="brand">NEXUS</span>
-          <button className="btn ghost sm" onClick={() => setA11y(true)} aria-label="Ajustar tamanho do texto e tema">
-            <span aria-hidden>🔠</span> Texto
-          </button>
-        </div>
-        <Outlet />
-      </main>
+      <div>
+        <header className="topbar">
+          <Link to="/hoje" className="wordmark">NEXUS</Link>
+          <div className="topbar-actions">
+            <button className="btn ghost sm" onClick={() => setAppearance(true)} aria-label="Tamanho do texto e tema">
+              <CaseSensitive size={20} aria-hidden /> Texto
+            </button>
+          </div>
+        </header>
+        <main>
+          <Outlet />
+        </main>
+      </div>
 
-      <nav className="bottom-nav" aria-label="Principal">
-        {MAIN.map((i) => (
-          <NavLink key={i.to} to={i.to} className={({ isActive }) => (isActive ? 'active' : '')}>
-            <span className="ico" aria-hidden>{i.icon}</span>
-            {i.label}
+      <nav className="tabbar" aria-label="Navegação principal">
+        {GROUPS.map((g) => (
+          <NavLink key={g.key} to={g.to} className={inGroup(g, pathname) ? 'active' : ''} aria-current={inGroup(g, pathname) ? 'page' : undefined}>
+            <g.icon size={24} strokeWidth={inGroup(g, pathname) ? 2.2 : 1.8} aria-hidden />
+            {g.label}
           </NavLink>
         ))}
-        <button onClick={() => setMore(true)} className={moreActive ? 'active' : ''} style={moreActive ? { color: 'var(--primary)' } : undefined}>
-          <span className="ico" aria-hidden>☰</span>
-          Mais
-        </button>
+        <NavLink to="/configuracoes" className={perfilActive ? 'active' : ''}>
+          <UserRound size={24} strokeWidth={perfilActive ? 2.2 : 1.8} aria-hidden />
+          Perfil
+        </NavLink>
       </nav>
 
-      {more && (
-        <Modal title="Mais" onClose={() => setMore(false)}>
-          <div className="stack" onClick={() => setMore(false)}>
-            {MORE.map((i) => (
-              <NavLink key={i.to} to={i.to} className={linkClass}>
-                <span aria-hidden>{i.icon}</span> {i.label}
-              </NavLink>
-            ))}
-          </div>
-        </Modal>
-      )}
-      {a11y && <AccessibilityModal onClose={() => setA11y(false)} />}
+      {appearance && <AppearanceSheet onClose={() => setAppearance(false)} />}
       <ToastHost />
     </div>
   )

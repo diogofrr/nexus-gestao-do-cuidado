@@ -1,10 +1,21 @@
 import { Link, useParams } from 'react-router-dom'
+import { CalendarClock, CalendarPlus, Check, CreditCard, FileText, MapPin, Ticket, Video } from 'lucide-react'
 import { useDb } from '../data/store'
 import { Empty } from '../components/ui'
 import { buildIcs, downloadIcs } from '../services/calendar'
-import { formatDateLong, formatMoney, parseLocalIso } from '../services/dates'
+import { formatMoney, friendlyDate, parseLocalIso } from '../services/dates'
 import { meetingUrl, sessionStart, SESSION_MINUTES } from '../services/sessions'
 import { METHOD_LABEL } from '../services/payment'
+
+function Done({ title, sub }: { title: string; sub: string }) {
+  return (
+    <div className="stack" style={{ textAlign: 'center', justifyItems: 'center', padding: '1rem 0 0.5rem' }}>
+      <div className="success-mark" aria-hidden><Check size={36} strokeWidth={2.6} /></div>
+      <h1>{title}</h1>
+      <p className="muted" style={{ maxWidth: '26rem' }}>{sub}</p>
+    </div>
+  )
+}
 
 export function SessaoConfirmada() {
   const { id } = useParams()
@@ -14,49 +25,49 @@ export function SessaoConfirmada() {
 
   if (!session || !psych) {
     return (
-      <Empty icon="🔍" title="Sessão não encontrada">
-        <Link to="/consultas">Ver minhas consultas</Link>
-      </Empty>
+      <div className="page">
+        <Empty title="Sessão não encontrada"><Link to="/consultas">Ver minhas consultas</Link></Empty>
+      </div>
     )
   }
 
   const online = session.modality === 'online'
   const addToCalendar = () =>
-    downloadIcs(
-      'sessao-nexus.ics',
-      buildIcs({
-        uid: session.id,
-        title: `Sessão com ${psych.name}`,
-        start: sessionStart(session),
-        minutes: SESSION_MINUTES,
-        location: online ? meetingUrl(session) : 'Consultório (endereço enviado por e-mail)',
-        description: 'Sessão de psicologia agendada pelo Nexus.',
-      }),
-    )
+    downloadIcs('sessao-nexus.ics', buildIcs({
+      uid: session.id,
+      title: `Sessão com ${psych.name}`,
+      start: sessionStart(session),
+      minutes: SESSION_MINUTES,
+      location: online ? meetingUrl(session) : 'Consultório (endereço enviado por e-mail)',
+      description: 'Sessão de psicologia agendada pelo Nexus.',
+    }))
 
   return (
-    <div className="stack">
-      <div className="card stack" style={{ textAlign: 'center' }}>
-        <div className="success-mark" aria-hidden>✓</div>
-        <h1>Sessão agendada!</h1>
-        <p className="muted">Enviamos os detalhes para {db.user.email}.</p>
-      </div>
+    <div className="page">
+      <div className="stack-lg">
+        <Done title="Sessão agendada" sub={`Enviamos os detalhes para ${db.user.email}.`} />
 
-      <div className="card stack">
-        <h2>Resumo</h2>
-        <p><b>{psych.name}</b> <span className="muted">· {psych.crp}</span></p>
-        <p>📅 {formatDateLong(session.date)}, às {session.time} (duração de {SESSION_MINUTES} minutos)</p>
-        <p>{online ? '💻 Online. O link abre 10 minutos antes, em Consultas.' : '📍 Presencial, no consultório. O endereço chega por e-mail.'}</p>
-        <p>💳 {formatMoney(session.priceCents)}, pago</p>
-        {session.reason && <p>📝 Motivo: {session.reason}</p>}
-      </div>
+        <section className="card stack">
+          <h2>Resumo</h2>
+          <div className="stack" style={{ gap: '0.8rem' }}>
+            <div className="kv"><Check size={18} aria-hidden /><span><b>{psych.name}</b> <span className="muted">· {psych.crp}</span></span></div>
+            <div className="kv"><CalendarClock size={18} aria-hidden /><span>{friendlyDate(session.date)}, às {session.time} ({SESSION_MINUTES} minutos)</span></div>
+            <div className="kv">
+              {online ? <Video size={18} aria-hidden /> : <MapPin size={18} aria-hidden />}
+              <span>{online ? 'Online. O link abre 10 minutos antes, em Consultas.' : 'Presencial, no consultório. O endereço chega por e-mail.'}</span>
+            </div>
+            <div className="kv"><CreditCard size={18} aria-hidden /><span>{formatMoney(session.priceCents)}, pago</span></div>
+            {session.reason && <div className="kv"><FileText size={18} aria-hidden /><span>{session.reason}</span></div>}
+          </div>
+        </section>
 
-      <div className="alert info">Precisa cancelar? É possível até 2 horas antes, em Consultas, e o horário volta para a agenda.</div>
+        <p className="muted small" style={{ textAlign: 'center' }}>Precisa cancelar? É possível até 2 horas antes, em Consultas, e o horário volta para a agenda.</p>
 
-      <div className="stack">
-        <Link to="/consultas" className="btn block">Ver minhas consultas</Link>
-        <button className="btn secondary block" onClick={addToCalendar}>Adicionar ao calendário</button>
-        <Link to="/dashboard" className="btn ghost block">Voltar ao início</Link>
+        <div className="stack">
+          <Link to={`/sessoes/${session.id}`} className="btn lg block">Ver detalhes da sessão</Link>
+          <button className="btn secondary block" onClick={addToCalendar}><CalendarPlus size={20} aria-hidden /> Adicionar ao calendário</button>
+          <Link to="/hoje" className="btn ghost block">Voltar para Hoje</Link>
+        </div>
       </div>
     </div>
   )
@@ -71,49 +82,50 @@ export function PedidoConfirmado() {
 
   if (!order || !event) {
     return (
-      <Empty icon="🔍" title="Pedido não encontrado">
-        <Link to="/meus-ingressos">Ver meus ingressos</Link>
-      </Empty>
+      <div className="page">
+        <Empty title="Pedido não encontrado"><Link to="/meus-ingressos">Ver meus ingressos</Link></Empty>
+      </div>
     )
   }
 
   const tickets = db.tickets.filter((t) => t.orderId === order.id)
   const addToCalendar = () =>
-    downloadIcs(
-      'evento-nexus.ics',
-      buildIcs({
-        uid: order.id,
-        title: event.title,
-        start: parseLocalIso(event.startsAt),
-        minutes: event.durationMinutes,
-        location: event.kind === 'online' ? event.streamUrl : event.location,
-        description: `${event.speaker}. Ingresso Nexus.`,
-      }),
-    )
+    downloadIcs('evento-nexus.ics', buildIcs({
+      uid: order.id,
+      title: event.title,
+      start: parseLocalIso(event.startsAt),
+      minutes: event.durationMinutes,
+      location: event.kind === 'online' ? event.streamUrl : event.location,
+      description: `${event.speaker}. Ingresso Nexus.`,
+    }))
 
   return (
-    <div className="stack">
-      <div className="card stack" style={{ textAlign: 'center' }}>
-        <div className="success-mark" aria-hidden>✓</div>
-        <h1>{order.totalCents === 0 ? 'Vaga garantida!' : 'Compra confirmada!'}</h1>
-        <p className="muted">
-          {tickets.length} ingresso{tickets.length === 1 ? '' : 's'} para <b>{event.title}</b>
-        </p>
-      </div>
+    <div className="page">
+      <div className="stack-lg">
+        <Done
+          title={order.totalCents === 0 ? 'Vaga garantida' : 'Compra confirmada'}
+          sub={`${tickets.length} ${tickets.length === 1 ? 'ingresso' : 'ingressos'} para ${event.title}.`}
+        />
 
-      <div className="card stack">
-        <h2>Resumo do pedido</h2>
-        <p>📅 {formatDateLong(event.startsAt.slice(0, 10))}, às {event.startsAt.slice(11, 16)}</p>
-        <p>{event.kind === 'online' ? '💻 Online. O link abre 15 minutos antes, em Meus ingressos.' : `📍 ${event.location}`}</p>
-        <p>🎟️ {type?.name} × {order.quantity}</p>
-        <p>💳 {formatMoney(order.totalCents)} · {METHOD_LABEL[order.method]}</p>
-        <p className="small muted">Participantes: {tickets.map((t) => t.holderName).join(', ')}</p>
-      </div>
+        <section className="card stack">
+          <h2>Resumo do pedido</h2>
+          <div className="stack" style={{ gap: '0.8rem' }}>
+            <div className="kv"><CalendarClock size={18} aria-hidden /><span>{friendlyDate(event.startsAt.slice(0, 10))}, às {event.startsAt.slice(11, 16)}</span></div>
+            <div className="kv">
+              {event.kind === 'online' ? <Video size={18} aria-hidden /> : <MapPin size={18} aria-hidden />}
+              <span>{event.kind === 'online' ? 'Online. O link abre 15 minutos antes, em Meus ingressos.' : event.location}</span>
+            </div>
+            <div className="kv"><Ticket size={18} aria-hidden /><span>{type?.name} × {order.quantity}</span></div>
+            <div className="kv"><CreditCard size={18} aria-hidden /><span>{formatMoney(order.totalCents)} · {METHOD_LABEL[order.method]}</span></div>
+          </div>
+          <p className="muted small">Participantes: {tickets.map((t) => t.holderName).join(', ')}</p>
+        </section>
 
-      <div className="stack">
-        <Link to="/meus-ingressos" className="btn block">Ver meus ingressos e QR Code</Link>
-        <button className="btn secondary block" onClick={addToCalendar}>Adicionar ao calendário</button>
-        <Link to="/eventos" className="btn ghost block">Ver outros eventos</Link>
+        <div className="stack">
+          <Link to="/meus-ingressos" className="btn lg block">Ver ingressos e QR Code</Link>
+          <button className="btn secondary block" onClick={addToCalendar}><CalendarPlus size={20} aria-hidden /> Adicionar ao calendário</button>
+          <Link to="/eventos" className="btn ghost block">Ver outros eventos</Link>
+        </div>
       </div>
     </div>
   )

@@ -155,5 +155,7 @@ export interface Db {
   orders: Order[]
   tickets: Ticket[]
   chat: ChatMessage[]
+  /** Doses de remédio já dadas: chave `${medicationId}|${YYYY-MM-DD}|${HH:mm}`. */
+  doseLog: Record<string, true>
   notifications: { medsAndAppointments: boolean; events: boolean }
 }

@@ -1,7 +1,8 @@
 import { useState, type FormEvent } from 'react'
+import { ScanLine } from 'lucide-react'
 import { checkIn } from '../data/actions'
 import { useDb } from '../data/store'
-import { Field } from '../components/ui'
+import { BackLink, Banner, Field, PageHeader } from '../components/ui'
 
 /** Tela de portaria: valida o código do ingresso na entrada do evento. */
 export default function CheckIn() {
@@ -19,20 +20,16 @@ export default function CheckIn() {
   }
 
   return (
-    <div className="stack">
-      <div className="page-head">
-        <div>
-          <h1>Check-in</h1>
-          <p>Portaria do evento: digite o código do ingresso</p>
-        </div>
-      </div>
+    <div className="page">
+      <BackLink to="/configuracoes">Configurações</BackLink>
+      <PageHeader title="Portaria do evento" sub="Digite o código do ingresso para liberar a entrada." />
       <form className="card stack" onSubmit={submit}>
         <Field label="Código do ingresso">
-          {(id) => <input id={id} className="code" placeholder="NXS-XXXXXXXXXX" value={code} onChange={(e) => setCode(e.target.value)} autoFocus />}
+          {(fid) => <input id={fid} className="input code" placeholder="NXS-XXXXXXXXXX" value={code} onChange={(e) => setCode(e.target.value)} autoFocus autoCapitalize="characters" />}
         </Field>
-        <button className="btn" type="submit" disabled={!code.trim()}>Validar</button>
+        <button className="btn lg" type="submit" disabled={!code.trim()}><ScanLine size={20} aria-hidden /> Validar entrada</button>
       </form>
-      {result && <div className={`alert ${result.ok ? 'success' : 'error'}`} role="status">{result.text}</div>}
+      {result && <div style={{ marginTop: '1rem' }} role="status"><Banner tone={result.ok ? 'success' : 'danger'}>{result.text}</Banner></div>}
     </div>
   )
 }

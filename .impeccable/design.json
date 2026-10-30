@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-30T12:00:00Z",
+  "title": "Design System: Nexus Gestão do Cuidado",
+  "extensions": {
+    "colorMeta": {
+      "brand": { "role": "primary", "displayName": "Caneta Azul", "canonical": "#116EB0", "tonalRamp": ["#06263f", "#0a3b63", "#0d5486", "#116eb0", "#4d96cc", "#86b9de", "#bcd9ee", "#e5f0f9"] },
+      "now": { "role": "secondary", "displayName": "Verde do Agora", "canonical": "#0A7A70", "tonalRamp": ["#03231f", "#064540", "#0a6a61", "#0a7a70", "#14b8a6", "#6fd8cb", "#b4ebe4", "#dcf4f0"] },
+      "desk": { "role": "neutral", "displayName": "Mesa Fria", "canonical": "#F1F4F9", "tonalRamp": ["#0e2036", "#27384d", "#435468", "#5d6e83", "#8f9db0", "#c9d5e3", "#e1e8f0", "#f1f4f9"] },
+      "ink": { "role": "neutral", "displayName": "Tinta Marinho", "canonical": "#0E2036", "tonalRamp": ["#0e2036", "#27384d", "#435468", "#5d6e83", "#8f9db0", "#c9d5e3", "#e1e8f0", "#f7f9fc"] },
+      "amber": { "role": "tertiary", "displayName": "Âmbar (remédio)", "canonical": "#A85206", "tonalRamp": ["#3a1c02", "#5e3004", "#823f05", "#a85206", "#d98a3d", "#ecb77f", "#f8d9b0", "#fdefd8"] },
+      "violet": { "role": "tertiary", "displayName": "Violeta (sessão)", "canonical": "#6A3FBD", "tonalRamp": ["#22134a", "#3a2275", "#512f98", "#6a3fbd", "#9576d3", "#b9a0f2", "#d8cbf6", "#ede7fa"] },
+      "rose": { "role": "tertiary", "displayName": "Rosa (evento)", "canonical": "#B0306A", "tonalRamp": ["#3d0f23", "#661c3f", "#8a2654", "#b0306a", "#cf6e98", "#e5a3c1", "#f2cbdc", "#fae6ef"] },
+      "danger": { "role": "tertiary", "displayName": "Perigo", "canonical": "#B42318", "tonalRamp": ["#3d0b07", "#661510", "#8c1c13", "#b42318", "#d4665d", "#e69d96", "#f3c7c3", "#fdeae7"] }
+    },
+    "typographyMeta": {
+      "wordmark": { "displayName": "Wordmark", "purpose": "Somente NEXUS, Playfair Display 700, caixa alta, azul da marca." },
+      "headline": { "displayName": "Título de página", "purpose": "h1, ex.: saudação da home." },
+      "title": { "displayName": "Título de seção", "purpose": "h2, faixa da semana e blocos." },
+      "subtitle": { "displayName": "Título de item", "purpose": "h3, itens e dias." },
+      "body": { "displayName": "Corpo", "purpose": "Texto corrido, figuras tabulares." },
+      "label": { "displayName": "Rótulo", "purpose": "Dia da semana, pílulas, abas." }
+    },
+    "shadows": [
+      { "name": "sm", "value": "0 1px 2px rgb(14 32 54 / 6%)", "purpose": "Pílula ativa do segmentado e botão do interruptor." },
+      { "name": "md", "value": "0 2px 6px rgb(14 32 54 / 6%), 0 12px 28px rgb(14 32 54 / 8%)", "purpose": "FAB, toast e barra de reserva em desktop." },
+      { "name": "up", "value": "0 -1px 0 #e1e8f0, 0 -10px 30px rgb(14 32 54 / 6%)", "purpose": "Barras fixas no rodapé (tabbar, reserva)." }
+    ],
+    "motion": [
+      { "name": "ease", "value": "cubic-bezier(0.22, 1, 0.36, 1)", "purpose": "Estados de botão, entrada das linhas e da folha." },
+      { "name": "rise", "value": "0.45s, escalonado 45ms por linha, de opacidade 0.6", "purpose": "Entrada das linhas da agenda, sempre a partir de estado legível." },
+      { "name": "ping", "value": "1.8s ease-out infinite", "purpose": "Ponto pulsante do que está acontecendo agora." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "sheet", "value": "700px" },
+      { "name": "rail", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botão primário",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Ação principal, caneta azul.",
+      "html": "<button class=\"ds-btn\">Agendar sessão</button>",
+      "css": ".ds-btn{min-height:3.1rem;padding:0 1.3rem;border-radius:10px;border:1.5px solid #116eb0;background:#116eb0;color:#fff;font-weight:650;font-size:1rem;cursor:pointer;transition:background .15s} .ds-btn:hover{background:#0d5f9b;border-color:#0d5f9b} .ds-btn:active{transform:translateY(1px)} .ds-btn:focus-visible{outline:3px solid #116eb0;outline-offset:2px}"
+    },
+    {
+      "name": "Botão do agora",
+      "kind": "button",
+      "refersTo": "button-live",
+      "description": "Entrar no que está acontecendo.",
+      "html": "<button class=\"ds-btn-live\">Entrar</button>",
+      "css": ".ds-btn-live{min-height:3.1rem;padding:0 1.3rem;border-radius:10px;border:1.5px solid #0a7a70;background:#0a7a70;color:#fff;font-weight:650;font-size:1rem;cursor:pointer} .ds-btn-live:hover{filter:brightness(1.08)} .ds-btn-live:focus-visible{outline:3px solid #116eb0;outline-offset:2px}"
+    },
+    {
+      "name": "Campo de texto",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Campo com borda de 1.5px e foco azul.",
+      "html": "<input class=\"ds-input\" placeholder=\"Buscar\" />",
+      "css": ".ds-input{width:100%;min-height:3.1rem;padding:.6rem .9rem;border-radius:10px;background:#fff;border:1.5px solid #c9d5e3;color:#0e2036;font:inherit} .ds-input::placeholder{color:#5d6e83} .ds-input:focus{outline:3px solid rgb(17 110 176 / 35%);border-color:#116eb0}"
+    },
+    {
+      "name": "Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Filtro em pílula; selecionado inverte para tinta.",
+      "html": "<button class=\"ds-chip\">Consultas</button>",
+      "css": ".ds-chip{min-height:2.5rem;padding:0 1rem;border-radius:999px;border:1.5px solid #c9d5e3;background:#fff;color:#0e2036;font-weight:600;font-size:.95rem;cursor:pointer} .ds-chip:hover{border-color:#116eb0} .ds-chip:focus-visible{outline:3px solid #116eb0;outline-offset:2px}"
+    },
+    {
+      "name": "Lista pautada",
+      "kind": "card",
+      "refersTo": "list",
+      "description": "Folha com itens separados por filete de 1px.",
+      "html": "<div class=\"ds-list\"><div class=\"ds-item\"><b>Losartana</b><span>08:00 · 1 comprimido</span></div><div class=\"ds-item ds-off\"><b>Metformina</b><span>12:00 · tomado</span></div></div>",
+      "css": ".ds-list{background:#fff;border:1px solid #e1e8f0;border-radius:12px;overflow:hidden;color:#0e2036} .ds-item{display:grid;padding:.95rem 1rem} .ds-item+.ds-item{border-top:1px solid #e1e8f0} .ds-item b{font-weight:650;font-size:1.02rem} .ds-item span{color:#435468;font-size:.9rem} .ds-off b{color:#5d6e83;text-decoration:line-through;text-decoration-thickness:1px}"
+    },
+    {
+      "name": "Linha do tempo com agora",
+      "kind": "custom",
+      "refersTo": "timeline-row-now",
+      "description": "Coluna de horas, régua contínua e a marca de agora atravessando a folha.",
+      "html": "<ol class=\"ds-tl\"><li class=\"ds-row\"><span class=\"ds-t\">09:00</span><span>Consulta, Dra. Lima</span></li><li class=\"ds-now\"><span class=\"ds-t\">10:12</span><span class=\"ds-lead\"><b>agora</b><i></i></span></li><li class=\"ds-row ds-live\"><span class=\"ds-t\">10:00</span><span>Sessão com psicólogo</span></li></ol>",
+      "css": ".ds-tl{list-style:none;margin:0;padding:0;position:relative;color:#0e2036;background:#fff} .ds-tl::before{content:'';position:absolute;top:0;bottom:0;left:3.65rem;width:1px;background:#c9d5e3} .ds-row,.ds-now{display:grid;grid-template-columns:3.4rem 1fr;gap:.5rem;align-items:center} .ds-row{padding:.85rem 0;border-top:1px solid #e1e8f0} .ds-t{text-align:right;padding-right:.7rem;font-weight:750;font-variant-numeric:tabular-nums} .ds-now{color:#0a7a70;font-weight:800;padding:.35rem 0} .ds-lead{display:flex;align-items:center;gap:.6rem;padding-left:.6rem} .ds-lead i{flex:1;height:3px;border-radius:3px;background:#14b8a6} .ds-live{background:#dcf4f0;border-radius:10px;border-top-color:transparent} .ds-live .ds-t{color:#0a7a70}"
+    },
+    {
+      "name": "Faixa da semana",
+      "kind": "nav",
+      "refersTo": "day-selected",
+      "description": "Sete dias com pontos de tipo; hoje com anel, selecionado em azul.",
+      "html": "<div class=\"ds-days\"><button class=\"ds-day\"><small>seg</small><b>27</b></button><button class=\"ds-day ds-sel\"><small>ter</small><b>28</b></button></div>",
+      "css": ".ds-days{display:grid;grid-template-columns:repeat(2,5rem);gap:.25rem} .ds-day{display:flex;flex-direction:column;align-items:center;padding:.5rem 0;border:0;border-radius:14px;background:transparent;color:#435468;cursor:pointer} .ds-day small{font-size:.75rem;font-weight:650;text-transform:uppercase;letter-spacing:.04em;color:#5d6e83} .ds-day b{font-size:1.2rem;color:#0e2036} .ds-day:hover{background:#f7f9fc} .ds-sel{background:#116eb0} .ds-sel small,.ds-sel b{color:#fff} .ds-day:focus-visible{outline:3px solid #116eb0;outline-offset:2px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "A Agenda Viva",
+    "overview": "Nexus é uma agenda semanal de papel: uma folha branca fria pousada sobre um fundo azul-acinzentado, escrita em tinta azul-marinho, dividida por linhas finas como a pauta de um caderno. Tudo no cuidado tem hora, então a home é o dia em linha do tempo, não um painel de cartões de ícone. O azul da marca é a caneta: aparece onde há uma ação a tomar. O verde-azulado é exclusivo do que está acontecendo agora e de mais nada.",
+    "keyCharacteristics": [
+      "Folha branca sobre fundo frio; profundidade por tom e linha, quase sem sombra.",
+      "Uma caneta (azul da marca) e uma cor de presente (verde-azulado do agora), nunca misturadas.",
+      "Coluna de horas fixa (3.4rem) com régua contínua, como a lombada de uma agenda.",
+      "Alvos de toque de 2.75rem a 3.4rem; estado nunca depende só de cor.",
+      "Tema claro, escuro e automático, mais alto contraste, todos por troca de tokens."
+    ],
+    "rules": [
+      { "name": "The Only Now Rule", "body": "O verde-azulado significa \"acontecendo agora\" e nada mais decorativo. Se o elemento não está em curso neste instante, não usa `now`. (Sucesso de confirmação é a única extensão aceita.)", "section": "colors" },
+      { "name": "The Pen Rule", "body": "Azul da marca marca ação ou seleção. Texto corrido, títulos e ícones de contexto ficam em tinta, não em azul.", "section": "colors" },
+      { "name": "The Type Dot Rule", "body": "Cor de tipo (âmbar, violeta, rosa) vive só em pontos e pílulas pequenos, nunca em fundos de bloco ou tiles. O tipo também é dito em texto e em forma.", "section": "colors" },
+      { "name": "The Serif Is a Signature Rule", "body": "Playfair aparece apenas no wordmark. Títulos e interface ficam em Figtree.", "section": "typography" },
+      { "name": "The Aligned Hours Rule", "body": "Todo horário e número que se compara usa figuras tabulares.", "section": "typography" },
+      { "name": "The Flat Sheet Rule", "body": "A folha e seus itens são planos em repouso. Sombra só em elementos que flutuam ou estão fixos sobre o conteúdo; nunca em itens de lista.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do usar linhas de 1px em rule (#E1E8F0) para dividir itens dentro de uma folha, em vez de cartões separados.",
+      "Do reservar `now` (#0A7A70 / #14B8A6 / #DCF4F0) ao que acontece agora.",
+      "Do usar o azul da marca (#116EB0) para ações, seleção e foco; texto e títulos em tinta (#0E2036).",
+      "Do mudar o estado pela própria linha: texto riscado em tinta 3, fundo now-soft, sem alterar a grade nem reduzir opacidade do texto.",
+      "Do comunicar tipo e estado com texto ou forma além de cor.",
+      "Do manter alvos interativos de pelo menos 2.75rem e anel de foco de 3px.",
+      "Do definir novas cores só como tokens com variante -soft e redefinição nos temas escuro e de alto contraste.",
+      "Do respeitar `prefers-reduced-motion` (toda animação cai para 0.001ms)."
+    ],
+    "donts": [
+      "Don't montar a home como painel de cartões de ícone, em gradiente azul ou com emoji.",
+      "Don't usar o verde do agora como decoração, ícone de categoria ou cor de marca secundária.",
+      "Don't pintar blocos ou tiles inteiros com cores de tipo; elas são pontos e pílulas.",
+      "Don't usar Playfair fora do wordmark.",
+      "Don't usar sombra em itens de lista; flutuar é a exceção.",
+      "Don't depender só de cor para indicar estado, tipo ou perigo.",
+      "Don't introduzir hex solto fora dos tokens."
+    ]
+  }
+}

@@ -64,6 +64,15 @@ export function removeMedication(id: string): void {
   setDb((d) => ({ ...d, medications: d.medications.filter((m) => m.id !== id) }))
 }
 
+export function toggleDose(key: string): void {
+  setDb((d) => {
+    const log = { ...d.doseLog }
+    if (log[key]) delete log[key]
+    else log[key] = true
+    return { ...d, doseLog: log }
+  })
+}
+
 // ---------- profissionais ----------
 
 export function saveProfessional(input: Omit<Professional, 'id'> & { id?: string }): void {

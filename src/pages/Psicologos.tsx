@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { ChevronRight, Search, Brain } from 'lucide-react'
 import { useDb } from '../data/store'
-import { Avatar, Empty } from '../components/ui'
+import { ApoioTabs, Avatar, Banner, Empty, PageHeader } from '../components/ui'
 import { nextAvailableDate } from '../services/availability'
-import { formatDateLong, formatMoney } from '../services/dates'
+import { formatMoney, friendlyDate } from '../services/dates'
 import { applyDiscount, PLANS } from '../services/plans'
 import type { Modality } from '../domain/types'
 
@@ -21,59 +22,49 @@ export default function Psicologos() {
   )
 
   return (
-    <div className="stack">
-      <div className="page-head">
-        <div>
-          <h1>Psicólogos</h1>
-          <p>Agende uma sessão com os profissionais da plataforma</p>
-        </div>
-      </div>
+    <div className="page">
+      <PageHeader title="Apoio" sub="Psicólogos da plataforma, conversa e autocuidado" />
+      <ApoioTabs />
 
-      {discount > 0 && <div className="alert success">Seu plano dá {discount}% de desconto nas sessões.</div>}
+      {discount > 0 && <div style={{ marginBottom: '1rem' }}><Banner tone="success">Seu plano dá {discount}% de desconto nas sessões.</Banner></div>}
 
-      <div className="field">
+      <div className="search" style={{ marginBottom: '0.75rem' }}>
+        <Search size={20} aria-hidden />
         <label className="sr-only" htmlFor="busca-psi">Buscar psicólogo</label>
-        <input id="busca-psi" type="search" placeholder="Buscar por nome ou especialidade..." value={query} onChange={(e) => setQuery(e.target.value)} />
+        <input id="busca-psi" className="input" type="search" placeholder="Buscar por nome ou tema" value={query} onChange={(e) => setQuery(e.target.value)} />
       </div>
-      <div className="chips" role="group" aria-label="Modalidade">
+      <div className="chips" role="group" aria-label="Modalidade" style={{ marginBottom: '0.75rem' }}>
         {(['todas', 'online', 'presencial'] as const).map((m) => (
           <button key={m} className="chip" aria-pressed={modality === m} onClick={() => setModality(m)}>
-            {m === 'todas' ? 'Todas' : m === 'online' ? 'Online' : 'Presencial'}
+            {m === 'todas' ? 'Todos' : m === 'online' ? 'Online' : 'Presencial'}
           </button>
         ))}
       </div>
 
       {list.length === 0 ? (
-        <Empty icon="🧠" title="Nenhum psicólogo encontrado">
-          <p>Tente outra busca ou modalidade.</p>
-        </Empty>
+        <div className="card">
+          <Empty icon={Brain} title="Nenhum psicólogo encontrado"><p>Tente outra busca ou outra modalidade.</p></Empty>
+        </div>
       ) : (
-        <div className="grid2">
+        <div className="list">
           {list.map((p) => {
             const next = nextAvailableDate(p, db.sessions)
             const price = applyDiscount(p.priceCents, discount)
             return (
-              <Link key={p.id} to={`/psicologos/${p.id}`} className="card stack" style={{ color: 'inherit' }}>
-                <div className="row">
-                  <Avatar psych={p} />
-                  <div>
-                    <h3>{p.name}</h3>
-                    <p className="muted small">{p.crp}</p>
+              <Link key={p.id} to={`/psicologos/${p.id}`} className="item" style={{ alignItems: 'flex-start' }}>
+                <Avatar name={p.name} hue={p.hue} size="lg" />
+                <div className="main">
+                  <div className="title">{p.name}</div>
+                  <div className="meta">{p.specialties.join(' · ')}</div>
+                  <div className="row" style={{ marginTop: 8, gap: '0.4rem' }}>
+                    {p.modalities.map((m) => <span key={m} className="pill">{m === 'online' ? 'Online' : 'Presencial'}</span>)}
+                    <span className="pill brand">{formatMoney(price)}</span>
+                  </div>
+                  <div className="small" style={{ marginTop: 8, color: next ? 'var(--ink-2)' : 'var(--amber)', fontWeight: 600 }}>
+                    {next ? `Próxima vaga: ${friendlyDate(next).toLowerCase()}` : 'Sem vagas nos próximos 60 dias'}
                   </div>
                 </div>
-                <div className="chips">
-                  {p.specialties.map((s) => <span key={s} className="badge">{s}</span>)}
-                  {p.modalities.map((m) => <span key={m} className="badge neutral">{m === 'online' ? 'Online' : 'Presencial'}</span>)}
-                </div>
-                <div className="row between">
-                  <span className="price">
-                    {formatMoney(price)}
-                    {discount > 0 && <span className="muted small" style={{ textDecoration: 'line-through', marginLeft: 6 }}>{formatMoney(p.priceCents)}</span>}
-                  </span>
-                  <span className="small muted">
-                    {next ? `Próxima vaga: ${formatDateLong(next)}` : 'Sem vagas nos próximos 60 dias'}
-                  </span>
-                </div>
+                <span className="trail"><ChevronRight size={20} aria-hidden /></span>
               </Link>
             )
           })}

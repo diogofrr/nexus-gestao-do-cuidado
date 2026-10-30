@@ -1,15 +1,21 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
+import '@fontsource-variable/figtree'
+import '@fontsource/playfair-display/latin-700.css'
 import Layout from './components/Layout'
-import Dashboard from './pages/Dashboard'
+import Hoje from './pages/Hoje'
 import Consultas from './pages/Consultas'
+import ConsultaForm from './pages/ConsultaForm'
+import SessaoDetalhe from './pages/SessaoDetalhe'
 import Medicacoes from './pages/Medicacoes'
+import MedicacaoForm from './pages/MedicacaoForm'
 import Profissionais from './pages/Profissionais'
+import ProfissionalForm from './pages/ProfissionalForm'
 import Tarefas from './pages/Tarefas'
 import Chat from './pages/Chat'
 import Plantao from './pages/Plantao'
-import Configuracoes from './pages/Configuracoes'
+import Configuracoes, { AparenciaPage, NotificacoesPage, PerfilPage, PlanoPage, PrivacidadePage } from './pages/Configuracoes'
 import Psicologos from './pages/Psicologos'
 import PsicologoDetalhe from './pages/PsicologoDetalhe'
 import Eventos from './pages/Eventos'
@@ -29,17 +35,24 @@ createRoot(document.getElementById('root')!).render(
     <HashRouter>
       <Routes>
         <Route element={<Layout />}>
-          <Route index element={<Navigate to="/dashboard" replace />} />
-          <Route path="dashboard" element={<Dashboard />} />
+          <Route index element={<Navigate to="/hoje" replace />} />
+          <Route path="hoje" element={<Hoje />} />
+          <Route path="dashboard" element={<Navigate to="/hoje" replace />} />
+
           <Route path="consultas" element={<Consultas />} />
+          <Route path="consultas/:id" element={<ConsultaForm />} />
+          <Route path="sessoes/:id" element={<SessaoDetalhe />} />
           <Route path="medicacoes" element={<Medicacoes />} />
-          <Route path="profissionais" element={<Profissionais />} />
+          <Route path="medicacoes/:id" element={<MedicacaoForm />} />
           <Route path="tarefas" element={<Tarefas />} />
-          <Route path="chat" element={<Chat />} />
-          <Route path="plantao" element={<Plantao />} />
-          <Route path="configuracoes" element={<Configuracoes />} />
+          <Route path="profissionais" element={<Profissionais />} />
+          <Route path="profissionais/:id" element={<ProfissionalForm />} />
+
           <Route path="psicologos" element={<Psicologos />} />
           <Route path="psicologos/:id" element={<PsicologoDetalhe />} />
+          <Route path="chat" element={<Chat />} />
+          <Route path="plantao" element={<Plantao />} />
+
           <Route path="eventos" element={<Eventos />} />
           <Route path="eventos/:id" element={<EventoDetalhe />} />
           <Route path="eventos/:id/comprar" element={<ComprarIngresso />} />
@@ -47,7 +60,15 @@ createRoot(document.getElementById('root')!).render(
           <Route path="checkin" element={<CheckIn />} />
           <Route path="confirmacao/sessao/:id" element={<SessaoConfirmada />} />
           <Route path="confirmacao/pedido/:id" element={<PedidoConfirmado />} />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+
+          <Route path="configuracoes" element={<Configuracoes />} />
+          <Route path="configuracoes/perfil" element={<PerfilPage />} />
+          <Route path="configuracoes/plano" element={<PlanoPage />} />
+          <Route path="configuracoes/aparencia" element={<AparenciaPage />} />
+          <Route path="configuracoes/notificacoes" element={<NotificacoesPage />} />
+          <Route path="configuracoes/privacidade" element={<PrivacidadePage />} />
+
+          <Route path="*" element={<Navigate to="/hoje" replace />} />
         </Route>
       </Routes>
     </HashRouter>

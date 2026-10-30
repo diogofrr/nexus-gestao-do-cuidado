@@ -10,8 +10,7 @@ export interface Prefs {
 }
 
 const KEY = 'nexus:prefs'
-// Padrão pensado em adultos: tema claro e texto já um pouco maior que o comum.
-const DEFAULTS: Prefs = { textSize: 'large', theme: 'light', highContrast: false }
+const DEFAULTS: Prefs = { textSize: 'normal', theme: 'light', highContrast: false }
 
 function load(): Prefs {
   try {
@@ -25,13 +24,19 @@ function load(): Prefs {
 
 let state: Prefs = load()
 const listeners = new Set<() => void>()
+const darkQuery = typeof window !== 'undefined' ? window.matchMedia('(prefers-color-scheme: dark)') : null
 
 export function applyPrefs(p: Prefs = state): void {
   const el = document.documentElement
   el.dataset.text = p.textSize
   el.dataset.theme = p.theme
   el.dataset.contrast = p.highContrast ? 'high' : 'normal'
+  // No modo automático, o CSS usa [data-dark] para acompanhar o sistema.
+  if (p.theme === 'auto' && darkQuery?.matches) el.dataset.dark = ''
+  else delete el.dataset.dark
 }
+
+darkQuery?.addEventListener('change', () => applyPrefs())
 
 export function setPrefs(patch: Partial<Prefs>): void {
   state = { ...state, ...patch }
