@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { bookSession, sessionPrice } from '../data/actions'
 import { useDb } from '../data/store'
-import { Avatar, Empty, Field, Modal, toast } from '../components/ui'
+import { Avatar, Empty, Field, Modal } from '../components/ui'
 import Payment from '../components/Payment'
 import { BOOKING_WINDOW_DAYS, getFreeSlots, isDateBookable, nextAvailableDate } from '../services/availability'
 import { addDays, formatDateLong, formatMoney, monthTitle, toDateStr } from '../services/dates'
@@ -64,8 +64,7 @@ export default function PsicologoDetalhe() {
       setError(r.error)
       return r.error
     }
-    toast('Sessão agendada com sucesso!')
-    navigate('/consultas')
+    navigate(`/confirmacao/sessao/${r.value.id}`)
     return null
   }
 

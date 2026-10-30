@@ -83,6 +83,8 @@ export interface PsychSession {
   priceCents: number
   paid: boolean
   createdAt: string
+  /** Horário ocupado por outro paciente: bloqueia a agenda, mas não aparece em "Consultas". */
+  external?: boolean
 }
 
 export type EventKind = 'online' | 'presencial'

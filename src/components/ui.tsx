@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react'
+import { Link } from 'react-router-dom'
 import type { Psychologist } from '../domain/types'
 
 export function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
@@ -35,6 +36,22 @@ export function Field({
       <label htmlFor={id}>{label}</label>
       {children(id)}
       {hint && <span className="hint">{hint}</span>}
+    </div>
+  )
+}
+
+/** Aviso de erro; quando é limite de plano, oferece o caminho para os planos. */
+export function FormError({ message, onNavigate }: { message: string; onNavigate?: () => void }) {
+  if (!message) return null
+  const planLimit = /plano Basic/.test(message)
+  return (
+    <div className={`alert ${planLimit ? 'warn' : 'error'}`} role="alert">
+      <p>{message}</p>
+      {planLimit && (
+        <p style={{ marginTop: 8 }}>
+          <Link to="/configuracoes" onClick={onNavigate}>Ver planos →</Link>
+        </p>
+      )}
     </div>
   )
 }

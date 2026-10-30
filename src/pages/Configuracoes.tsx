@@ -1,10 +1,11 @@
 import { useState, type FormEvent } from 'react'
 import { changePlan, setNotifications, updateUser } from '../data/actions'
 import { resetDb, useDb } from '../data/store'
+import AccessibilityModal from '../components/Accessibility'
 import { Confirm, Field, Modal, toast } from '../components/ui'
 import { PLANS } from '../services/plans'
 
-type Panel = null | 'perfil' | 'planos' | 'notificacoes' | 'privacidade'
+type Panel = null | 'perfil' | 'planos' | 'notificacoes' | 'privacidade' | 'aparencia'
 
 export default function Configuracoes() {
   const db = useDb()
@@ -42,6 +43,7 @@ export default function Configuracoes() {
       <Item id="planos" title="Plano de Assinatura" sub={`${plan.name} — ${plan.priceLabel}`} />
 
       <h2>Preferências</h2>
+      <Item id="aparencia" title="Aparência e leitura" sub="Tamanho do texto, tema e alto contraste" />
       <Item id="notificacoes" title="Notificações" sub="Medicamentos, consultas e eventos" />
       <Item id="privacidade" title="Privacidade e Segurança" sub="Seus dados protegidos" />
 
@@ -49,6 +51,7 @@ export default function Configuracoes() {
 
       {panel === 'perfil' && <Perfil onClose={() => setPanel(null)} />}
       {panel === 'planos' && <Planos onClose={() => setPanel(null)} />}
+      {panel === 'aparencia' && <AccessibilityModal onClose={() => setPanel(null)} />}
       {panel === 'notificacoes' && <Notificacoes onClose={() => setPanel(null)} />}
       {panel === 'privacidade' && <Privacidade onClose={() => setPanel(null)} />}
     </div>

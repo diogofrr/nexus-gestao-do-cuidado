@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { purchaseTickets } from '../data/actions'
 import { useDb } from '../data/store'
-import { Empty, toast } from '../components/ui'
+import { Empty } from '../components/ui'
 import Payment from '../components/Payment'
 import { formatDateLong, formatMoney } from '../services/dates'
 import { MAX_TICKETS_PER_ORDER, isEventOver, remaining, unitPrice } from '../services/tickets'
@@ -49,8 +49,7 @@ export default function ComprarIngresso() {
       setError(r.error)
       return r.error
     }
-    toast(total === 0 ? 'Vaga garantida!' : 'Compra confirmada!')
-    navigate('/meus-ingressos')
+    navigate(`/confirmacao/pedido/${r.order.id}`)
     return null
   }
 

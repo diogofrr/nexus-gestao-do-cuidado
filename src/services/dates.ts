@@ -45,6 +45,24 @@ export function formatDateLong(date: string): string {
   return `${WEEKDAYS[d.getDay()]}, ${d.getDate()} de ${MONTHS_LONG[d.getMonth()]}`
 }
 
+/** "Hoje", "Amanhã" ou o dia por extenso. */
+export function relativeDay(date: string, now: Date = new Date()): string {
+  const today = toDateStr(now)
+  if (date === today) return 'Hoje'
+  if (date === toDateStr(addDays(now, 1))) return 'Amanhã'
+  return formatDateLong(date)
+}
+
+/** "Hoje, 30 de outubro", "Amanhã, 31 de outubro" ou "sexta, 23 de outubro". */
+export function friendlyDate(date: string, now: Date = new Date()): string {
+  const rel = relativeDay(date, now)
+  if (rel === 'Hoje' || rel === 'Amanhã') {
+    const d = parseDateStr(date)
+    return `${rel}, ${d.getDate()} de ${MONTHS_LONG[d.getMonth()]}`
+  }
+  return rel
+}
+
 export function monthTitle(year: number, month: number): string {
   return `${MONTHS_LONG[month][0].toUpperCase()}${MONTHS_LONG[month].slice(1)} de ${year}`
 }

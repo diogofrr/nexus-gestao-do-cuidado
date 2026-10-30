@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom'
 import { useDb } from '../data/store'
-import { formatDateShort, parseDateTime, parseLocalIso } from '../services/dates'
-import { isEventOver, myTickets } from '../services/tickets'
+import { parseDateTime, parseLocalIso, relativeDay } from '../services/dates'
+import { isSessionOpen, isSessionOver } from '../services/sessions'
+import { isEventOver, isStreamOpen, myTickets } from '../services/tickets'
 
 const TILES = [
   { to: '/consultas', icon: '🩺', title: 'Consultas', sub: 'Agendar e gerenciar' },
@@ -22,9 +23,11 @@ export default function Dashboard() {
   const appts = db.appointments.filter((a) => a.status === 'agendada')
   const pending = db.tasks.filter((t) => !t.done)
 
-  const nextSession = db.sessions
-    .filter((s) => s.status === 'agendada' && parseDateTime(s.date, s.time) > now)
-    .sort((a, b) => parseDateTime(a.date, a.time).getTime() - parseDateTime(b.date, b.time).getTime())[0]
+  const upcomingSessions = db.sessions
+    .filter((s) => !s.external && s.status === 'agendada' && !isSessionOver(s, now))
+    .sort((a, b) => parseDateTime(a.date, a.time).getTime() - parseDateTime(b.date, b.time).getTime())
+  const nextSession = upcomingSessions[0]
+  const upcomingCount = appts.length + upcomingSessions.length
   const nextSessionPsych = db.psychologists.find((p) => p.id === nextSession?.psychologistId)
 
   const myEventIds = new Set(myTickets(db).filter((t) => !t.cancelledAt).map((t) => t.eventId))
@@ -42,7 +45,7 @@ export default function Dashboard() {
       <section aria-label="Resumo do cuidado" className="stack">
         <h2>Resumo do Cuidado</h2>
         <div className="stat-row">
-          <Link to="/consultas" className="card stat"><b>{appts.length}</b>Consultas</Link>
+          <Link to="/consultas" className="card stat"><b>{upcomingCount}</b>Consultas</Link>
           <Link to="/medicacoes" className="card stat"><b>{db.medications.length}</b>Medicações</Link>
           <Link to="/tarefas" className="card stat"><b>{pending.length}</b>Pendentes</Link>
         </div>
@@ -55,7 +58,7 @@ export default function Dashboard() {
             <h3>Próxima sessão</h3>
             {nextSession && nextSessionPsych ? (
               <p className="muted small">
-                {nextSessionPsych.name}, {formatDateShort(nextSession.date)} às {nextSession.time}
+                {nextSessionPsych.name}, {isSessionOpen(nextSession, now) ? 'acontecendo agora' : `${relativeDay(nextSession.date, now).toLowerCase()} às ${nextSession.time}`}
               </p>
             ) : (
               <p className="muted small">Nenhuma sessão marcada. Agende com um psicólogo.</p>
@@ -68,7 +71,7 @@ export default function Dashboard() {
             <h3>Próximo evento</h3>
             {nextEvent ? (
               <p className="muted small">
-                {nextEvent.title}, {formatDateShort(nextEvent.startsAt.slice(0, 10))} às {nextEvent.startsAt.slice(11, 16)}
+                {nextEvent.title}, {isStreamOpen(nextEvent, now) ? 'ao vivo agora' : `${relativeDay(nextEvent.startsAt.slice(0, 10), now).toLowerCase()} às ${nextEvent.startsAt.slice(11, 16)}`}
               </p>
             ) : (
               <p className="muted small">Veja palestras e encontros que vão acontecer.</p>

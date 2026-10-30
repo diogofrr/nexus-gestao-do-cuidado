@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { removeMedication, saveMedication } from '../data/actions'
 import { useDb } from '../data/store'
 import type { Medication } from '../domain/types'
-import { Confirm, Empty, Field, Modal, toast } from '../components/ui'
+import { Confirm, Empty, Field, FormError, Modal, toast } from '../components/ui'
 import { formatDateShort } from '../services/dates'
 
 const FREQUENCIES = ['1x ao dia', '2x ao dia', '3x ao dia', '4x ao dia', 'a cada 8h', 'a cada 12h', 'quando necessário', 'outro']
@@ -44,8 +44,8 @@ export default function Medicacoes() {
                 </p>
                 <div className="row" style={{ marginTop: 6 }}>
                   {m.stock !== null && (
-                    <span className={`badge ${low ? 'warn' : 'neutral'}`}>
-                      {low ? 'Estoque baixo: ' : 'Estoque: '}{m.stock} un.
+                    <span className={`badge ${m.stock === 0 ? 'danger' : low ? 'warn' : 'neutral'}`}>
+                      {m.stock === 0 ? 'Estoque acabou' : `${low ? 'Estoque baixo: ' : 'Estoque: '}${m.stock} un.`}
                     </span>
                   )}
                   {m.nextPurchase && <span className="small muted">Próxima compra: {formatDateShort(m.nextPurchase)}</span>}
@@ -104,7 +104,7 @@ function MedForm({ initial, onClose }: { initial: Draft; onClose: () => void }) 
           </Field>
         </div>
         <Field label="Observações">{(id) => <textarea id={id} value={form.notes} onChange={(e) => set('notes', e.target.value)} />}</Field>
-        {error && <div className="alert error" role="alert">{error}</div>}
+        <FormError message={error} onNavigate={onClose} />
         <div className="row">
           <button className="btn" type="submit">Salvar medicação</button>
           <button className="btn ghost" type="button" onClick={onClose}>Cancelar</button>

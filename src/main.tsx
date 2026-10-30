@@ -17,7 +17,11 @@ import EventoDetalhe from './pages/EventoDetalhe'
 import ComprarIngresso from './pages/ComprarIngresso'
 import MeusIngressos from './pages/MeusIngressos'
 import CheckIn from './pages/CheckIn'
+import { PedidoConfirmado, SessaoConfirmada } from './pages/Confirmacao'
+import { applyPrefs } from './data/prefs'
 import './styles.css'
+
+applyPrefs()
 
 // HashRouter: o app é estático e funciona em qualquer hospedagem sem regra de rewrite.
 createRoot(document.getElementById('root')!).render(
@@ -41,6 +45,8 @@ createRoot(document.getElementById('root')!).render(
           <Route path="eventos/:id/comprar" element={<ComprarIngresso />} />
           <Route path="meus-ingressos" element={<MeusIngressos />} />
           <Route path="checkin" element={<CheckIn />} />
+          <Route path="confirmacao/sessao/:id" element={<SessaoConfirmada />} />
+          <Route path="confirmacao/pedido/:id" element={<PedidoConfirmado />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Route>
       </Routes>

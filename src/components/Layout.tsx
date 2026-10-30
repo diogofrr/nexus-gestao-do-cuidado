@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import AccessibilityModal from './Accessibility'
 import { Modal, ToastHost } from './ui'
 
 const MAIN = [
   { to: '/dashboard', label: 'Início', icon: '🏠' },
   { to: '/consultas', label: 'Consultas', icon: '🩺' },
-  { to: '/medicacoes', label: 'Medicações', icon: '💊' },
+  { to: '/medicacoes', label: 'Remédios', icon: '💊' },
   { to: '/tarefas', label: 'Tarefas', icon: '✅' },
   { to: '/eventos', label: 'Eventos', icon: '🎟️' },
 ]
@@ -23,6 +24,7 @@ const linkClass = ({ isActive }: { isActive: boolean }) => `side-link${isActive 
 
 export default function Layout() {
   const [more, setMore] = useState(false)
+  const [a11y, setA11y] = useState(false)
   const { pathname } = useLocation()
   const moreActive = MORE.some((m) => pathname.startsWith(m.to))
 
@@ -35,9 +37,19 @@ export default function Layout() {
             <span aria-hidden>{i.icon}</span> {i.label}
           </NavLink>
         ))}
+        <div className="spacer" />
+        <button className="side-link" onClick={() => setA11y(true)}>
+          <span aria-hidden>🔠</span> Tamanho do texto
+        </button>
       </nav>
 
       <main className="main">
+        <div className="topbar">
+          <span className="brand">NEXUS</span>
+          <button className="btn ghost sm" onClick={() => setA11y(true)} aria-label="Ajustar tamanho do texto e tema">
+            <span aria-hidden>🔠</span> Texto
+          </button>
+        </div>
         <Outlet />
       </main>
 
@@ -65,6 +77,7 @@ export default function Layout() {
           </div>
         </Modal>
       )}
+      {a11y && <AccessibilityModal onClose={() => setA11y(false)} />}
       <ToastHost />
     </div>
   )

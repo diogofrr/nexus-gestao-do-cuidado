@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { chatMessagesToday, sendChat } from '../data/actions'
 import { useDb } from '../data/store'
+import { FormError } from '../components/ui'
 import { PLANS } from '../services/plans'
 
 const SUGGESTIONS = [
@@ -64,7 +65,7 @@ export default function Chat() {
         </div>
       )}
 
-      {error && <div className="alert warn" role="alert">{error}</div>}
+      <FormError message={error} />
 
       <form className="row" onSubmit={submit}>
         <label className="sr-only" htmlFor="msg">Mensagem</label>

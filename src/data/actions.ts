@@ -12,8 +12,8 @@ import type {
   User,
 } from '../domain/types'
 import { getFreeSlots } from '../services/availability'
-import { parseDateTime } from '../services/dates'
 import { applyDiscount, PLANS } from '../services/plans'
+import { CANCEL_LIMIT_HOURS, canCancelSession } from '../services/sessions'
 import { buildPurchase, type PurchaseResult } from '../services/tickets'
 import { getDb, newId, setDb } from './store'
 
@@ -142,7 +142,7 @@ export function bookSession(input: BookSessionInput, now: Date = new Date()): Re
   if (!getFreeSlots(psych, input.date, db.sessions, now).includes(input.time))
     return fail('Esse horário acabou de ser ocupado ou não está mais disponível. Escolha outro.')
   const clash = db.sessions.find(
-    (s) => s.status === 'agendada' && s.date === input.date && s.time === input.time,
+    (s) => !s.external && s.status === 'agendada' && s.date === input.date && s.time === input.time,
   )
   if (clash) return fail('Você já tem uma sessão agendada nesse mesmo horário.')
 
@@ -166,8 +166,8 @@ export function bookSession(input: BookSessionInput, now: Date = new Date()): Re
 export function cancelSession(id: string, now: Date = new Date()): Result {
   const s = getDb().sessions.find((x) => x.id === id)
   if (!s) return fail('Sessão não encontrada.')
-  if (parseDateTime(s.date, s.time).getTime() - now.getTime() < 2 * 3_600_000)
-    return fail('Cancelamentos só são possíveis até 2 horas antes da sessão.')
+  if (!canCancelSession(s, now))
+    return fail(`Cancelamentos só são possíveis até ${CANCEL_LIMIT_HOURS} horas antes da sessão.`)
   setDb((d) => ({ ...d, sessions: d.sessions.map((x) => (x.id === id ? { ...x, status: 'cancelada' } : x)) }))
   return { ok: true }
 }
