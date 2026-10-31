@@ -77,7 +77,7 @@ export default function PsicologoDetalhe() {
           <div className="row" style={{ flexWrap: 'nowrap', gap: '1rem' }}>
             <Avatar name={psych.name} hue={psych.hue} size="lg" />
             <div>
-              <h1 style={{ fontSize: '1.45rem' }}>{psych.name}</h1>
+              <h1 style={{ fontSize: 'var(--fs-lg)' }}>{psych.name}</h1>
               <p className="muted small">{psych.crp}</p>
             </div>
           </div>

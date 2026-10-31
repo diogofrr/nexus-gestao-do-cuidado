@@ -1,0 +1,62 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-font-size",
+        "value": "17px",
+        "createdAt": "2026-10-31T00:00:57.293Z",
+        "reason": "Claude decidiu: passo da escala de texto do usuário (Normal) definido no html; é preferência de acessibilidade, não degrau da rampa"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "21.5px",
+        "createdAt": "2026-10-31T00:00:57.375Z",
+        "reason": "Claude decidiu: passo da escala de texto do usuário (Muito grande) definido no html; é preferência de acessibilidade, não degrau da rampa"
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "6px",
+        "createdAt": "2026-10-31T00:00:57.459Z",
+        "reason": "Claude decidiu: micro-raio do contorno de foco e de scrollbar, não é forma de componente"
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "3px",
+        "createdAt": "2026-10-31T00:00:57.541Z",
+        "reason": "Claude decidiu: pontas do fio de 3px do agora e do indicador da aba; acompanham a espessura da linha"
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "2px",
+        "createdAt": "2026-10-31T00:00:57.624Z",
+        "reason": "Claude decidiu: cantos dos marcadores de 7px da legenda e dos pontos de tipo (quadrado e losango)"
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "4px",
+        "createdAt": "2026-10-31T00:00:57.715Z",
+        "reason": "Claude decidiu: canto de cauda do balão do chat (assimetria deliberada do balão)"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#052b27",
+        "createdAt": "2026-10-31T00:00:57.798Z",
+        "reason": "Claude decidiu: tinta escura sobre o botão Entrar teal no tema escuro, para manter contraste AA"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgb(8 18 32 / 55%)",
+        "createdAt": "2026-10-31T00:00:57.888Z",
+        "reason": "Claude decidiu: cortina neutra atrás do sheet, função e não cor de marca"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "cascadia mono",
+        "createdAt": "2026-10-31T00:00:57.969Z",
+        "reason": "Claude decidiu: pilha monoespaçada do sistema para códigos de ingresso e texto Pix (dado, não voz tipográfica)"
+      }
+    ]
+  }
+}

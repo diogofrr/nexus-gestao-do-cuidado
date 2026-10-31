@@ -62,6 +62,7 @@ typography:
 rounded:
   sm: "10px"
   md: "12px"
+  lg: "20px"
   pill: "999px"
 spacing:
   xs: "0.25rem"
@@ -233,7 +234,7 @@ Folha com borda de 1px e raio de 12px; itens separados por linha de 1px; hover e
 Coluna de hora (3.4rem, 750, tabular, à direita) com régua vertical contínua de 1px em rule-strong. Linhas separadas por filete. A marca "agora" é uma linha de 3px em now-dot que atravessa a folha com a hora e a palavra "agora" em now, inserida antes do primeiro item futuro ou em curso. A linha que está acontecendo ganha fundo now-soft; as concluídas passadas ficam recolhidas atrás de um "N itens concluídos". Entrada das linhas com leve subida escalonada (45ms), partindo de opacidade legível.
 
 ### Faixa da semana
-Sete dias em botões de 14px de raio: dia da semana em maiúsculas pequenas, número em 1.2rem, pontos de tipo (círculo = consulta, quadrado = sessão, losango = evento). Hoje tem anel de 2px na cor da marca; selecionado vira fundo azul com texto branco.
+Sete dias em botões de 12px de raio: dia da semana em maiúsculas pequenas, número em 1.2rem, pontos de tipo (círculo = consulta, quadrado = sessão, losango = evento). Hoje tem anel de 2px na cor da marca; selecionado vira fundo azul com texto branco.
 
 ### Inputs / Fields
 Altura 3.1rem, raio 10px, borda 1.5px em rule-strong, fundo folha. Foco: contorno de 3px em azul 35% e borda azul. Placeholder em tinta 3. Rótulo acima em 650.
@@ -245,7 +246,7 @@ Mobile: tabbar de 5 itens, rótulo 0.72rem em 650; ativo em azul da marca com tr
 Painel now-soft com borda now a 35% e ponto pulsante (anel que se expande a cada 1.8s); título em now; cada item com botão "Entrar" na cor do agora. Só existe quando algo está em curso.
 
 ### Outros
-Banners de 10px com tom -soft e ícone na cor do tipo; medidor de estoque de 6px (azul, âmbar, vermelho); folha modal (sheet) só para confirmar e pagar, com 22px de raio superior; bolhas de chat de 20px; ticket com QR.
+Banners de 10px com tom -soft e ícone na cor do tipo; medidor de estoque de 6px (azul, âmbar, vermelho); folha modal (sheet) só para confirmar e pagar, com 20px de raio superior; bolhas de chat de 20px; ticket com QR.
 
 ## Do's and Don'ts
 
@@ -271,5 +272,5 @@ Banners de 10px com tom -soft e ícone na cor do tipo; medidor de estoque de 6px
 ## Não canonizado (defeitos do build, não regras)
 
 - Desfoque de fundo (`backdrop-filter`) na topbar, formbar e composer: efeito de vidro que a marca de papel não pede; não herdar em novas superfícies.
-- Escala de raios que escapou do sistema (14px na faixa da semana, 16px nos seletores de dia do agendamento, 20px nas bolhas, 22px na folha): valores avulsos, usar 10, 12 ou pílula em superfícies novas.
+- Raios e tamanhos de fonte agora saem de tokens (`--radius-sm` 10px, `--radius` 12px, `--radius-lg` 20px para o sheet e os balões; `--fs-xs` 0.8rem, `--fs-sm` 0.875rem, `--fs-md` 0.95rem, `--fs-lg` 1.5rem). Em superfícies novas, usar os tokens em vez de literais. Exceções registradas no detector: passos de texto 17px e 21.5px da escala do usuário, micro-raios de 2 a 6px de marcas finas, tinta `#052b27` sobre o botão teal no escuro, cortina do sheet e a pilha monoespaçada dos códigos.
 - A home envolve a linha do tempo num `.card` (borda e raio) dentro da seção, em tensão com "lista pautada, não cartão": registrado como desvio, não como padrão de cartão a reutilizar.
