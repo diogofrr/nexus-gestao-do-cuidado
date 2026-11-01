@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { MapPin, Video } from 'lucide-react'
 import { bookSession, sessionPrice } from '../data/actions'
 import { useDb } from '../data/store'
-import { Avatar, BackLink, Banner, Empty, Field, Sheet } from '../components/ui'
+import { Avatar, BackLink, Banner, Empty, Sheet } from '../components/ui'
 import Payment from '../components/Payment'
 import { getFreeSlots } from '../services/availability'
 import { addDays, formatMoney, friendlyDate, parseDateStr, toDateStr } from '../services/dates'
@@ -31,7 +31,6 @@ export default function PsicologoDetalhe() {
   const [date, setDate] = useState<string | null>(() => dates.find((d) => (free[d] ?? []).length > 0) ?? null)
   const [time, setTime] = useState<string | null>(null)
   const [modality, setModality] = useState<Modality | null>(null)
-  const [reason, setReason] = useState('')
   const [paying, setPaying] = useState(false)
   const [error, setError] = useState('')
 
@@ -57,7 +56,7 @@ export default function PsicologoDetalhe() {
 
   const confirm = (): string | null => {
     if (!date || !time || !chosenModality) return 'Escolha dia, horário e modalidade.'
-    const r = bookSession({ psychologistId: psych.id, date, time, modality: chosenModality, reason })
+    const r = bookSession({ psychologistId: psych.id, date, time, modality: chosenModality, reason: '' })
     if (!r.ok) {
       setPaying(false)
       setTime(null)
@@ -82,11 +81,8 @@ export default function PsicologoDetalhe() {
             </div>
           </div>
           <p>{psych.bio}</p>
-          <div className="row" style={{ gap: '0.4rem' }}>
-            {psych.specialties.map((s) => <span key={s} className="pill brand">{s}</span>)}
-            {psych.modalities.map((m) => <span key={m} className="pill">{m === 'online' ? 'Online' : 'Presencial'}</span>)}
-          </div>
-          <p><b className="price" style={{ fontSize: '1.2rem' }}>{formatMoney(price)}</b> <span className="muted">por sessão de 50 minutos</span></p>
+          <p className="muted">{psych.specialties.join(' · ')}</p>
+          <p><b className="price" style={{ fontSize: '1.2rem' }}>{formatMoney(price)}</b> <span className="muted">· 50 min · {psych.modalities.length > 1 ? 'online ou presencial' : psych.modalities[0] === 'online' ? 'online' : 'presencial'}</span></p>
         </section>
 
         {!hasAny ? (
@@ -134,28 +130,17 @@ export default function PsicologoDetalhe() {
               </section>
             )}
 
-            {date && time && (
-              <section className="stack" aria-label="Detalhes da sessão">
-                {psych.modalities.length > 1 && (
-                  <div className="stack" role="group" aria-label="Modalidade">
-                    <h2>Como prefere?</h2>
-                    <div className="stack" style={{ gap: '0.6rem' }}>
-                      {psych.modalities.map((m) => (
-                        <button key={m} className="option" aria-pressed={chosenModality === m} onClick={() => setModality(m)}>
-                          {m === 'online' ? <Video size={22} aria-hidden /> : <MapPin size={22} aria-hidden />}
-                          <span className="grow">
-                            <b>{m === 'online' ? 'Online' : 'Presencial'}</b>
-                            <br />
-                            <span className="muted small">{m === 'online' ? 'Por vídeo, de onde você estiver' : 'No consultório'}</span>
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                <Field label="Quer contar o motivo? (opcional)">
-                  {(fid) => <textarea id={fid} className="textarea" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Conte brevemente o que gostaria de trabalhar" />}
-                </Field>
+            {date && time && psych.modalities.length > 1 && (
+              <section className="stack" role="group" aria-label="Modalidade">
+                <h2>Como prefere?</h2>
+                <div className="stack" style={{ gap: '0.6rem' }}>
+                  {psych.modalities.map((m) => (
+                    <button key={m} className="option" aria-pressed={chosenModality === m} onClick={() => setModality(m)}>
+                      {m === 'online' ? <Video size={22} aria-hidden /> : <MapPin size={22} aria-hidden />}
+                      <b className="grow">{m === 'online' ? 'Online' : 'Presencial'}</b>
+                    </button>
+                  ))}
+                </div>
               </section>
             )}
           </>
@@ -173,7 +158,7 @@ export default function PsicologoDetalhe() {
                 <div className="muted small">{chosenModality === 'online' ? 'Online' : 'Presencial'} · {formatMoney(price)}</div>
               </>
             ) : (
-              <div className="muted small">Escolha dia, horário{psych.modalities.length > 1 ? ' e modalidade' : ''}</div>
+              <div className="muted small">Escolha um dia e um horário</div>
             )}
           </div>
           <button className="btn lg" disabled={!ready} onClick={() => setPaying(true)}>Continuar</button>

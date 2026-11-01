@@ -76,7 +76,7 @@ export function agendaForDay(db: Db, date: string, now: Date = new Date()): Agen
         kind: 'remedio',
         time,
         title: `${m.name} ${m.dosage}`,
-        meta: m.elderName ? `Para ${m.elderName}` : m.frequency,
+        meta: '',
         state: taken ? 'feito' : late ? 'atrasado' : 'proximo',
         href: `/medicacoes/${m.id}`,
         dose: { key, taken },

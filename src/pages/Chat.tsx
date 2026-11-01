@@ -7,10 +7,8 @@ import { PLANS } from '../services/plans'
 
 const SUGGESTIONS = [
   'Como lidar com minha exaustão hoje?',
-  'O que é síndrome de burnout do cuidador?',
-  'Como organizar melhor a rotina de medicamentos?',
+  'Como organizar a rotina de remédios?',
   'Meus direitos como cuidador familiar',
-  'Como conversar com o idoso sobre limitações?',
 ]
 
 export default function Chat() {
@@ -40,25 +38,17 @@ export default function Chat() {
 
   return (
     <div className="page">
-      <PageHeader
-        title="Apoio"
-        sub="Psicólogos da plataforma, conversa e autocuidado"
-      />
+      <PageHeader title="Apoio" />
       <ApoioTabs />
 
-      <div className="row between" style={{ marginBottom: '0.75rem' }}>
-        <span className="row" style={{ gap: '0.45rem' }}>
-          <span className="live-dot" aria-hidden />
-          <b>Assistente Nexus</b>
-          <span className="muted small">online agora</span>
-        </span>
-        {limit !== Infinity && <span className="pill">{used}/{limit} mensagens hoje</span>}
-      </div>
+      {limit !== Infinity && limit - used <= 3 && (
+        <p className="muted small" style={{ marginBottom: '0.75rem' }}>
+          {limit - used > 0 ? `Restam ${limit - used} mensagens hoje.` : 'Suas mensagens de hoje acabaram.'}
+        </p>
+      )}
 
       <div className="chat-wrap" aria-live="polite">
-        <div className="bubble assistant">
-          Olá! Sou o assistente Nexus. Estou aqui para apoiar você no cuidado e no seu bem-estar. Pode me perguntar sobre organização do cuidado, remédios, emoções ou simplesmente desabafar.{'\n\n'}Em que posso ajudar hoje?
-        </div>
+        <div className="bubble assistant">Olá! Sou o assistente Nexus. Em que posso ajudar hoje?</div>
         {db.chat.map((m) => (
           <div key={m.id} className={`bubble ${m.role}`}>{m.text}</div>
         ))}
@@ -66,13 +56,10 @@ export default function Chat() {
       </div>
 
       {db.chat.length === 0 && (
-        <div className="stack" style={{ marginTop: '1rem', gap: '0.5rem' }}>
-          <span className="faint small" style={{ fontWeight: 650 }}>Sugestões para começar</span>
-          <div className="chips wrap">
-            {SUGGESTIONS.map((s) => (
-              <button key={s} className="chip" onClick={() => send(s)}>{s}</button>
-            ))}
-          </div>
+        <div className="chips wrap" style={{ marginTop: '1rem' }}>
+          {SUGGESTIONS.map((s) => (
+            <button key={s} className="chip" onClick={() => send(s)}>{s}</button>
+          ))}
         </div>
       )}
 

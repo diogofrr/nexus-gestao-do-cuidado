@@ -36,18 +36,18 @@ export default function MeusIngressos() {
 
   return (
     <div className="page">
-      <PageHeader title="Eventos" sub="Palestras e encontros, online e presenciais" />
+      <PageHeader title="Eventos" />
       <EventosTabs />
 
       <div className="chips" role="group" aria-label="Filtrar ingressos" style={{ marginBottom: '1rem' }}>
-        <button className="chip" aria-pressed={tab === 'proximos'} onClick={() => setTab('proximos')}>Próximos ({upcoming.length})</button>
-        <button className="chip" aria-pressed={tab === 'encerrados'} onClick={() => setTab('encerrados')}>Encerrados e cancelados ({history.length})</button>
+        <button className="chip" aria-pressed={tab === 'proximos'} onClick={() => setTab('proximos')}>Próximos</button>
+        <button className="chip" aria-pressed={tab === 'encerrados'} onClick={() => setTab('encerrados')}>Anteriores</button>
       </div>
 
       {list.length === 0 ? (
         <div className="card">
           <Empty icon={TicketCheck} title={tab === 'proximos' ? 'Você ainda não tem ingressos' : 'Nada por aqui'}>
-            {tab === 'proximos' && <><p>Quando comprar um ingresso, ele aparece aqui com o QR Code.</p><Link className="btn secondary sm" to="/eventos">Ver programação</Link></>}
+            {tab === 'proximos' && <Link className="btn secondary sm" to="/eventos">Ver programação</Link>}
           </Empty>
         </div>
       ) : (
@@ -59,34 +59,34 @@ export default function MeusIngressos() {
             return (
               <article key={t.id} className={`ticket${off ? ' off' : ''}`}>
                 <div className="info">
-                  <div className="row" style={{ gap: '0.4rem' }}>
-                    <span className={`pill ${e.kind === 'online' ? 'brand' : 'rose'}`}>{e.kind === 'online' ? 'Online' : 'Presencial'}</span>
-                    {stream && <span className="pill now"><span className="live-dot" aria-hidden /> Ao vivo</span>}
-                    {t.cancelledAt && <span className="pill danger">Cancelado</span>}
-                    {t.checkedInAt && <span className="pill now">Utilizado</span>}
-                  </div>
+                  {(stream || t.cancelledAt || t.checkedInAt) && (
+                    <div className="row" style={{ gap: '0.4rem' }}>
+                      {stream && <span className="pill now"><span className="live-dot" aria-hidden /> Ao vivo</span>}
+                      {t.cancelledAt && <span className="pill danger">Cancelado</span>}
+                      {t.checkedInAt && <span className="pill now">Utilizado</span>}
+                    </div>
+                  )}
                   <h3>{e.title}</h3>
                   <p className="muted small">{friendlyDate(e.startsAt.slice(0, 10))}, {e.startsAt.slice(11, 16)} · {type?.name}</p>
-                  <p className="small">Participante: <b>{t.holderName}</b></p>
-                  <p className="code faint">{t.code}</p>
+                  <p className="small"><b>{t.holderName}</b></p>
                   <div className="row" style={{ marginTop: 4 }}>
                     {e.kind === 'online' && !off && (
                       stream
                         ? <a className="btn live sm" href={e.streamUrl} target="_blank" rel="noreferrer"><Video size={16} aria-hidden /> Entrar na transmissão</a>
-                        : <span className="small muted">O link abre 15 minutos antes do início.</span>
+                        : <span className="small muted">O link abre 15 minutos antes.</span>
                     )}
                     {e.kind === 'presencial' && !off && <span className="small muted row" style={{ gap: '0.3rem' }}><MapPin size={15} aria-hidden /> {e.location}</span>}
                     {!off && !t.checkedInAt && (
                       <Confirm
                         label="Cancelar ingresso"
-                        message="Cancelar este ingresso? A vaga volta a ficar disponível. O estorno é simulado nesta demonstração."
+                        message="Cancelar este ingresso? A vaga volta a ficar disponível."
                         className="btn ghost sm"
                         onConfirm={() => { const r = cancelTicket(t); toast(r.ok ? 'Ingresso cancelado' : r.error) }}
                       />
                     )}
                   </div>
                 </div>
-                {!off && <div className="qr"><Qr code={t.code} /></div>}
+                {!off && <div className="qr"><Qr code={t.code} /><span className="code faint small">{t.code}</span></div>}
               </article>
             )
           })}

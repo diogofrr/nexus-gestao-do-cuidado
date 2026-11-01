@@ -39,7 +39,7 @@ PRODUCT.md             usuários, propósito e princípios do produto
 
 ## Navegação
 
-Cinco abas no celular (menu lateral no desktop): **Hoje**, **Cuidado**, **Apoio**, **Eventos** e **Perfil**. Cada aba tem
+Uma coisa principal por tela e o resto a um toque de distância. Cinco abas no celular (menu lateral no desktop): **Hoje**, **Cuidado**, **Apoio**, **Eventos** e **Perfil**. Cada aba tem
 seções internas (por exemplo, Cuidado: Consultas, Remédios, Tarefas, Rede). Formulários abrem em tela cheia; a janela
 sobreposta aparece só para confirmar uma exclusão e para pagar.
 
@@ -51,7 +51,7 @@ sobreposta aparece só para confirmar uma exclusão e para pagar.
 | Ingressos | Estoque por tipo, máx. 5 por pedido, nome por participante. Cancelar devolve a vaga. Gratuito não passa por pagamento. |
 | Transmissão online | Liberada 15 min antes do início até o fim. |
 | Remédios | Os horários cadastrados viram doses na agenda de Hoje; "Dei" registra a dose, e dose passada sem registro aparece como atrasada. |
-| Check-in | Perfil > Portaria do evento valida o código uma única vez. |
+| Check-in | A portaria é uma tela só da demonstração, fora do menu: abra `#/checkin` e digite o código do ingresso (ele valida uma única vez). |
 | Planos | Basic: 5 remédios, 3 consultas, 10 msgs/dia, preço cheio. Plus: ilimitado, 20% em sessões, 10% em ingressos. Família: 30% e 20%. |
 
 Para apagar tudo e voltar aos dados de exemplo: Perfil > Privacidade e dados.
@@ -85,5 +85,5 @@ Os dados de exemplo cobrem os estados de borda, todos relativos ao momento em qu
 1. Hoje: marcar "Dei" no remédio atrasado e entrar na sessão ao vivo.
 2. Apoio > Psicólogos > escolher um > dia > horário > Pix > confirmação com "Adicionar ao calendário".
 3. Eventos > evento presencial > comprar 2 ingressos com cartão `4242 4242 4242 4242` > Meus ingressos (QR).
-4. Perfil > Portaria do evento: validar o código copiado do ingresso.
+4. Portaria (fora do menu, só para a demonstração): abrir `#/checkin` e digitar o código que aparece abaixo do QR do ingresso.
 5. Perfil > Plano: trocar para Plus e ver os descontos.

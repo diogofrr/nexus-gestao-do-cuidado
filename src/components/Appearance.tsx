@@ -44,15 +44,10 @@ export function AppearanceControls() {
       </div>
 
       <label className="list switch" style={{ borderRadius: 'var(--radius)' }}>
-        <span>
-          <b>Alto contraste</b>
-          <br />
-          <span className="muted small">Letras mais escuras e bordas mais marcadas</span>
-        </span>
+        <b>Alto contraste</b>
         <input type="checkbox" checked={prefs.highContrast} onChange={(e) => setPrefs({ highContrast: e.target.checked })} />
         <span className="track" aria-hidden />
       </label>
-      <p className="faint small">As escolhas ficam salvas neste aparelho.</p>
     </div>
   )
 }

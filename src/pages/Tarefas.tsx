@@ -1,63 +1,57 @@
 import { useState, type FormEvent } from 'react'
-import { Check, ChevronDown, Pin, Plus, Trash2 } from 'lucide-react'
-import { removeTask, saveTask, toggleTask, toggleTaskPin } from '../data/actions'
+import { Check, ChevronDown, Plus, Trash2 } from 'lucide-react'
+import { removeTask, saveTask, toggleTask } from '../data/actions'
 import { useDb } from '../data/store'
-import type { Task, TaskPriority } from '../domain/types'
+import type { Task } from '../domain/types'
 import { CuidadoTabs, Empty, PageHeader, toast } from '../components/ui'
 
-const PRIORITY: Record<TaskPriority, { label: string; tone: string; rank: number }> = {
-  alta: { label: 'Alta', tone: 'danger', rank: 0 },
-  media: { label: 'Média', tone: 'amber', rank: 1 },
-  baixa: { label: 'Baixa', tone: '', rank: 2 },
-}
+const RANK = { alta: 0, media: 1, baixa: 2 } as const
 
 export default function Tarefas() {
   const db = useDb()
   const [showDone, setShowDone] = useState(false)
   const [title, setTitle] = useState('')
-  const [priority, setPriority] = useState<TaskPriority>('media')
+  const [urgent, setUrgent] = useState(false)
 
   const pending = db.tasks
     .filter((t) => !t.done)
-    .sort((a, b) => Number(b.pinned) - Number(a.pinned) || PRIORITY[a.priority].rank - PRIORITY[b.priority].rank)
+    .sort((a, b) => Number(b.pinned) - Number(a.pinned) || RANK[a.priority] - RANK[b.priority])
   const done = db.tasks.filter((t) => t.done)
 
   const add = (e: FormEvent) => {
     e.preventDefault()
     if (!title.trim()) return
-    saveTask({ title: title.trim(), category: '', priority, done: false, pinned: false })
+    saveTask({ title: title.trim(), category: '', priority: urgent ? 'alta' : 'media', done: false, pinned: false })
     setTitle('')
+    setUrgent(false)
     toast('Tarefa adicionada')
   }
 
   return (
     <div className="page">
-      <PageHeader title="Cuidado" sub="Consultas, remédios, tarefas e a rede de apoio" />
+      <PageHeader title="Cuidado" />
       <CuidadoTabs />
 
       <form className="card stack" onSubmit={add}>
         <label className="sr-only" htmlFor="nova-tarefa">Nova tarefa</label>
         <input id="nova-tarefa" className="input" placeholder="O que precisa ser feito?" value={title} onChange={(e) => setTitle(e.target.value)} />
-        <div className="row between">
-          <div className="chips" role="group" aria-label="Prioridade">
-            {(['baixa', 'media', 'alta'] as const).map((p) => (
-              <button type="button" key={p} className="chip" aria-pressed={priority === p} onClick={() => setPriority(p)}>{PRIORITY[p].label}</button>
-            ))}
+        {title.trim() && (
+          <div className="row between">
+            <button type="button" className="chip" aria-pressed={urgent} onClick={() => setUrgent((u) => !u)}>Urgente</button>
+            <button className="btn" type="submit"><Plus size={20} aria-hidden /> Adicionar</button>
           </div>
-          <button className="btn" type="submit" disabled={!title.trim()}><Plus size={20} aria-hidden /> Adicionar</button>
-        </div>
+        )}
       </form>
 
-      <div className="group-label">{pending.length} {pending.length === 1 ? 'pendente' : 'pendentes'}</div>
-      {pending.length === 0 ? (
-        <div className="card">
-          <Empty icon={Check} title="Tudo em dia">
-            <p>Nenhuma tarefa pendente. Aproveite para descansar um pouco.</p>
-          </Empty>
-        </div>
-      ) : (
-        <div className="list">{pending.map((t) => <TaskRow key={t.id} task={t} />)}</div>
-      )}
+      <div style={{ marginTop: '1rem' }}>
+        {pending.length === 0 ? (
+          <div className="card">
+            <Empty icon={Check} title="Tudo em dia" />
+          </div>
+        ) : (
+          <div className="list">{pending.map((t) => <TaskRow key={t.id} task={t} />)}</div>
+        )}
+      </div>
 
       {done.length > 0 && (
         <>
@@ -73,7 +67,6 @@ export default function Tarefas() {
 }
 
 function TaskRow({ task }: { task: Task }) {
-  const p = PRIORITY[task.priority]
   return (
     <div className={`item${task.done ? ' off' : ''}`}>
       <button
@@ -86,23 +79,9 @@ function TaskRow({ task }: { task: Task }) {
       </button>
       <div className="main">
         <div className="title">{task.title}</div>
-        <div className="row" style={{ gap: '0.4rem', marginTop: 4 }}>
-          {!task.done && <span className={`pill ${p.tone}`}>{p.label}</span>}
-          {task.category && <span className="muted small">{task.category}</span>}
-        </div>
+        {!task.done && task.priority === 'alta' && <span className="pill danger" style={{ marginTop: 4 }}>Urgente</span>}
       </div>
       <div className="trail">
-        {!task.done && (
-          <button
-            className="icon-btn"
-            onClick={() => toggleTaskPin(task.id)}
-            aria-pressed={task.pinned}
-            aria-label={task.pinned ? 'Desafixar' : 'Fixar no topo'}
-            style={task.pinned ? { color: 'var(--brand)' } : undefined}
-          >
-            <Pin size={20} fill={task.pinned ? 'currentColor' : 'none'} />
-          </button>
-        )}
         <button className="icon-btn" onClick={() => { removeTask(task.id); toast('Tarefa removida') }} aria-label={`Excluir: ${task.title}`}>
           <Trash2 size={20} />
         </button>
